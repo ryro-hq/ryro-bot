@@ -2,7 +2,16 @@ import { PgClient } from '@effect/sql-pg';
 import { Effect } from 'effect';
 import { SqlClient } from 'effect/sql';
 import type { Settings } from './config.js';
-import { audit, claim, enqueue, finish, migrate, reap, renew } from './db.js';
+import {
+  audit,
+  claim,
+  checkDurability,
+  enqueue,
+  finish,
+  migrate,
+  reap,
+  renew,
+} from './db.js';
 import { discover } from './discovery.js';
 import { reconcileProject } from './reconcile.js';
 import { persistWebhook, webhookServer } from './webhook.js';
@@ -96,6 +105,7 @@ export const workOnce = (settings: Settings) =>
 export const service = (settings: Settings) =>
   Effect.gen(function* () {
     yield* migrate;
+    yield* checkDurability;
     const sql = yield* SqlClient.SqlClient;
     const context = yield* Effect.context<
       SqlClient.SqlClient | PgClient.PgClient

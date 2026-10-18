@@ -78,6 +78,25 @@ export const migrate = PgMigrator.run({
   table: 'ryro_bot_migrations',
 });
 
+export const checkDurability = Effect.gen(function* () {
+  const sql = yield* SqlClient.SqlClient;
+  const [settings] = yield* sql<{
+    fsync: string;
+    full_page_writes: string;
+    synchronous_commit: string;
+  }>`SELECT current_setting('fsync') AS fsync,
+    current_setting('full_page_writes') AS full_page_writes,current_setting('synchronous_commit') AS synchronous_commit`;
+  if (
+    settings.fsync !== 'on' ||
+    settings.full_page_writes !== 'on' ||
+    settings.synchronous_commit !== 'on'
+  ) {
+    return yield* new BotError({
+      code: 'unsafe-postgresql-durability-settings',
+    });
+  }
+});
+
 export const enqueue = (
   repository: string,
   kind: string,

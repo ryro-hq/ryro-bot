@@ -37,7 +37,8 @@ docker compose exec bot node dist/admin.js inventory ryro-hq/syrox-pkgs
 ```
 
 The service runs versioned migrations on startup under the PostgreSQL migrator
-lock. `/healthz` checks database reachability. Start in observation and inspect
+lock and refuses PostgreSQL configurations without fsync, full-page writes and
+synchronous commits. `/healthz` checks database reachability. Start in observation and inspect
 audit, incomplete channels, dead jobs and remote state before moving to
 preparation. The admin CLI has local OS/database authentication; do not mount
 these credentials into build runners. For a remote PostgreSQL server, disable
