@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "assessment": "best-practices",
+  "projects": [
+    {
+      "repository": "ryro-hq/ryro-bot",
+      "status": "not-assessed",
+      "result": null,
+      "evidence": null,
+      "owner": "@fullzer4",
+      "pending": "Run the separate assessment against the public repository; retain tool version, source SHA, timestamp and complete output."
+    },
+    {
+      "repository": "ryro-hq/syrox-pkgs",
+      "status": "not-assessed",
+      "result": null,
+      "evidence": null,
+      "owner": "@fullzer4",
+      "pending": "Run the separate assessment against the public repository; retain tool version, source SHA, timestamp and complete output."
+    }
+  ]
+}

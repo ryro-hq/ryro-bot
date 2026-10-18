@@ -1,0 +1,268 @@
+name: Syrox packages qualification
+on:
+  workflow_call:
+    inputs:
+      expected_sha:
+        description: Exact dispatched commit when explicitly requested
+        required: false
+        default: ''
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: catalog-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'merge_group' }}
+env:
+  CARGO_INCREMENTAL: '0'
+  CARGO_PROFILE_DEV_DEBUG: '0'
+  CARGO_PROFILE_TEST_DEBUG: '0'
+  CARGO_BUILD_JOBS: '2'
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      hosts: ${{ steps.matrix.outputs.hosts }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Admit the exact dispatched SHA
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]
+            test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          fi
+      - uses: ./.github/actions/core
+      - name: Export the engine's systemd interface contract
+        working-directory: .core
+        run: cargo run --locked -p syrox-engine --example systemd_contract > /tmp/systemd-contract.json
+      - name: Verify every lock and retained identity
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: |
+          python3 tests/test-package-templates.py "$(command -v srx)"
+          python3 tests/test-configured-template.py "$(command -v srx)"
+          python3 hosts/systemd/sync.py /tmp/systemd-contract.json --check
+          python3 tests/test-systemd-contract.py /tmp/systemd-contract.json
+          python3 tests/check-packages.py "$(command -v srx)"
+          python3 tests/check-platforms.py "$(command -v srx)"
+          python3 tests/check-toolchains.py "$(command -v srx)"
+          python3 tests/test-qualification-hosts.py
+          srx catalog generate . --check
+          srx catalog check .
+          srx catalog lock . --check
+          if [ -n "$BASE_SHA" ] && git cat-file -e "$BASE_SHA:Catalog.lock" 2>/dev/null; then
+            git show "$BASE_SHA:Catalog.lock" > /tmp/previous-catalog.lock
+            srx catalog preserve . /tmp/previous-catalog.lock
+          fi
+      - id: matrix
+        run: |
+          srx catalog matrix . > /tmp/catalog-matrix.json
+          python3 .github/scripts/qualification.py matrix /tmp/catalog-matrix.json >> "$GITHUB_OUTPUT"
+
+  environment:
+    name: environment (${{ matrix.host }})
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.check.outputs.hosts) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/core
+      - name: Admit KVM for environment preparation
+        run: |
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod 660 /dev/kvm
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        id: vm-cache
+        with:
+          path: .environment
+          key: catalog-vm-${{ matrix.host }}-linux-6.12.109-${{ hashFiles('.syrox-core', '.github/qualification-hosts.json', '.github/scripts/qualification.py', '.core/tests/vm/*.Containerfile', '.core/crates/syrox/tests/vm_support/prepare.rs') }}
+      - name: Build the isolated Linux environment
+        if: steps.vm-cache.outputs.cache-hit != 'true'
+        working-directory: .core
+        env:
+          SYROX_VM_CONFIG: ${{ github.workspace }}/.environment/preparation.json
+          BASE_IMAGE: ${{ matrix.base_image }}
+          QUALIFICATION_HOST: ${{ matrix.host }}
+        run: |
+          mkdir -p ../.environment
+          docker buildx create --name catalog-environment --driver docker-container \
+            --driver-opt cpu-period=100000,cpu-quota=200000,memory=4g,memory-swap=4g
+          docker buildx build --builder catalog-environment --load --iidfile ../.environment/image.id \
+            --build-arg RUST_IMAGE=rust@sha256:4cd829461bd5c4d511c32e269da9cb8929223b666519d8004e35fc8d1d771ab7 \
+            --build-arg BASE_IMAGE="$BASE_IMAGE" \
+            -f tests/vm/guest.Containerfile -t syrox-catalog:ci tests/vm
+          docker save --output ../.environment/image.tar syrox-catalog:ci
+          cargo test --locked -p syrox --test vm -- --prepare --install-runtime --build-firmware \
+            --image-archive "$PWD/../.environment/image.tar" --preparation-image "$(cat ../.environment/image.id)" --profile native
+          cp target/vm-runtime/bin/msb ../.environment/msb
+          cp target/vm-runtime/landlock/{libkrunfw.so.5.6.1,provenance.json} ../.environment/
+          python3 ../.github/scripts/qualification.py record "$QUALIFICATION_HOST" ../.environment
+          cd ../.environment
+          sha256sum image.tar image.id msb libkrunfw.so.5.6.1 provenance.json "host-$QUALIFICATION_HOST.json" > SHA256SUMS
+      - name: Release the bounded image builder
+        if: always() && steps.vm-cache.outputs.cache-hit != 'true'
+        run: docker buildx rm --force catalog-environment
+      - name: Check restored environment integrity
+        run: |
+          cd .environment
+          sha256sum -c SHA256SUMS
+          jq -e '.kernel == "6.12.109" and .sdk == "0.7.3"' provenance.json
+          test "$(sha256sum libkrunfw.so.5.6.1 | cut -d' ' -f1)" = "$(jq -r .firmware_sha256 provenance.json)"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        if: github.ref == 'refs/heads/main' && steps.vm-cache.outputs.cache-hit != 'true'
+        with:
+          path: .environment
+          key: ${{ steps.vm-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: environment-${{ matrix.host }}
+          path: .environment/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: host-${{ matrix.host }}
+          path: .environment/host-${{ matrix.host }}.json
+          if-no-files-found: error
+
+  qualify:
+    name: qualify (${{ matrix.host }} ${{ matrix.name }} ${{ matrix.version }} ${{ matrix.variant }} ${{ matrix.system }})
+    needs: [check, environment]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.check.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/core
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: environment-${{ matrix.host }}
+          path: .environment
+      - name: Verify environment and admit KVM
+        run: |
+          (cd .environment && sha256sum -c SHA256SUMS)
+          chmod +x .environment/msb
+          test -c /dev/kvm
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod 660 /dev/kvm
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        id: store-cache
+        with:
+          path: .store
+          key: store-${{ matrix.host }}-${{ matrix.system }}-${{ matrix.identity }}-${{ hashFiles('.syrox-core', '.environment/SHA256SUMS') }}
+      - name: Configure exact source permissions
+        run: |
+          {
+            printf '[build]\nhost-toolchain = "/usr"\n[network]\nallow-https = [\n'
+            jq -r '.versions[].package.source_url | @json + ","' Catalog.lock | sort -u
+            printf '"https://ftp.gnu.org/gnu/glibc/glibc-2.44.tar.xz",\n]\n'
+          } > build.toml
+      - name: Build, run, validate HTTP and import offline in the VM
+        working-directory: .core
+        env:
+          IDENTITY: ${{ matrix.identity }}
+          QUALIFICATION_HOST: ${{ matrix.host }}
+          SYROX_VM_CONFIG: ${{ github.workspace }}/.environment/job.json
+        run: |
+          cargo test --locked -p syrox --test vm -- --prepare \
+            --image-archive "$PWD/../.environment/image.tar" \
+            --runtime "$PWD/../.environment/msb" --firmware "$PWD/../.environment/libkrunfw.so.5.6.1" \
+            --profile native --candidate-bundle "$PWD/target/catalog-candidate"
+          cargo test --locked -p syrox --test vm -- --qualify-catalog \
+            "$PWD/.." "$IDENTITY" "$PWD/../build.toml" "$PWD/../.store" "$PWD/../.evidence"
+          cp ../.evidence/qualification-vm.json "../.evidence/results/$IDENTITY.$QUALIFICATION_HOST.vm.json"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        if: github.ref == 'refs/heads/main' && steps.store-cache.outputs.cache-hit != 'true'
+        with:
+          path: .store
+          key: ${{ steps.store-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: logs-${{ matrix.host }}-${{ matrix.identity }}
+          path: |
+            .evidence/*.log
+            .evidence/qualification-vm.json
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: qualification-${{ matrix.host }}-${{ matrix.identity }}
+          path: .evidence/results/*
+          if-no-files-found: error
+
+  manifests:
+    name: manifest (${{ matrix.host }})
+    needs: [check, qualify]
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.check.outputs.hosts) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/core
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: qualification-${{ matrix.host }}-*
+          merge-multiple: true
+          path: .release
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: host-${{ matrix.host }}
+          path: .release
+      - name: Require every combination and bind it to this guest environment
+        env:
+          QUALIFICATION_HOST: ${{ matrix.host }}
+        run: |
+          srx catalog release-manifest . --evidence .release --output ".release/manifest-$QUALIFICATION_HOST.json"
+          python3 .github/scripts/qualification.py verify "$QUALIFICATION_HOST" .release
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: matrix.canonical
+        with:
+          name: canonical-release
+          path: .release/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: host-manifest-${{ matrix.host }}
+          path: |
+            .release/manifest-${{ matrix.host }}.json
+            .release/qualification-${{ matrix.host }}.json
+            .release/host-${{ matrix.host }}.json
+            .release/*.${{ matrix.host }}.vm.json
+          if-no-files-found: error
+
+  success:
+    needs: [check, environment, qualify, manifests]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: jq -e 'all(.[]; .result == "success")' <<< "$RESULTS"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: ./.github/actions/core
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: canonical-release
+          path: .release
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          pattern: host-manifest-*
+          merge-multiple: true
+          path: .release
+      - name: Reverify the canonical release and retain both userspace reports
+        run: srx catalog release-manifest . --evidence .release --output .release/manifest.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: release
+          path: .release/*
+          if-no-files-found: error

@@ -1,0 +1,17 @@
+ryro-bot
+Copyright 2026 Ryro contributors
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+Architecture reference: rust-lang/triagebot (MIT OR Apache-2.0).
+No Triagebot source code is included.
+
+TypeScript/Effect conventions follow the independently operated ryro-backend.
+Initial routing and maintenance policy were migrated from local syrox-pkgs
+prototypes. Existing product recipes and qualification logic remain in their
+repositories.
+
+OSPS requirement identifiers refer to OpenSSF Security Baseline v2026.08.28,
+revision a26a7963f6fd098c1e82829322ec9e1196a4f294. Requirements are linked,
+not represented as certification. Dependency licenses remain with dependencies;
+package-lock.json identifies the exact resolved dependency graph.

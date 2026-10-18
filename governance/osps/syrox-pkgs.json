@@ -1,0 +1,664 @@
+{
+  "schema": 1,
+  "project": "ryro-hq/syrox-pkgs",
+  "baseline": "2026.08.28",
+  "baselineRevision": "a26a7963f6fd098c1e82829322ec9e1196a4f294",
+  "assessment": "not-certified",
+  "requirements": [
+    {
+      "requirement": "OSPS-AC-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0101",
+      "evidence": [
+        ".ryro-bot.toml",
+        ".github/CODEOWNERS",
+        "governance/ACCESS.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-AC-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0201",
+      "evidence": [
+        ".ryro-bot.toml",
+        ".github/CODEOWNERS",
+        "governance/ACCESS.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-AC-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0301",
+      "evidence": [
+        ".ryro-bot.toml",
+        ".github/CODEOWNERS",
+        "governance/ACCESS.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-AC-03.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0302",
+      "evidence": [
+        ".ryro-bot.toml",
+        ".github/CODEOWNERS",
+        "governance/ACCESS.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-AC-04.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0401",
+      "evidence": [
+        ".ryro-bot.toml",
+        ".github/CODEOWNERS",
+        "governance/ACCESS.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-AC-04.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0402",
+      "evidence": [
+        ".ryro-bot.toml",
+        ".github/CODEOWNERS",
+        "governance/ACCESS.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0101",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-01.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0102",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-01.03",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0103",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-01.04",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0104",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0201",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-02.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0202",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0301",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-03.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0302",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-04.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0401",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-05.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0501",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-06.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0601",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-07.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0701",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-BR-07.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-br-0702",
+      "evidence": [
+        ".github/workflows/catalog.yml",
+        ".github/qualification-hosts.json"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0101",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0201",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0301",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-03.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0302",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-04.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0401",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-05.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0501",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-06.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0601",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-DO-07.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0701",
+      "evidence": ["README.md", "docs/recipes.md", "SECURITY.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-GV-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0101",
+      "evidence": ["CONTRIBUTING.md", "MAINTAINERS.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-GV-01.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0102",
+      "evidence": ["CONTRIBUTING.md", "MAINTAINERS.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-GV-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0201",
+      "evidence": ["CONTRIBUTING.md", "MAINTAINERS.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-GV-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0301",
+      "evidence": ["CONTRIBUTING.md", "MAINTAINERS.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-GV-03.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0302",
+      "evidence": ["CONTRIBUTING.md", "MAINTAINERS.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-GV-04.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0401",
+      "evidence": ["CONTRIBUTING.md", "MAINTAINERS.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-LE-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0101",
+      "evidence": [
+        "LICENSE",
+        "docs/bootstrap-distribution.md",
+        "CONTRIBUTING.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-LE-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0201",
+      "evidence": [
+        "LICENSE",
+        "docs/bootstrap-distribution.md",
+        "CONTRIBUTING.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-LE-02.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0202",
+      "evidence": [
+        "LICENSE",
+        "docs/bootstrap-distribution.md",
+        "CONTRIBUTING.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-LE-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0301",
+      "evidence": [
+        "LICENSE",
+        "docs/bootstrap-distribution.md",
+        "CONTRIBUTING.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-LE-03.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0302",
+      "evidence": [
+        "LICENSE",
+        "docs/bootstrap-distribution.md",
+        "CONTRIBUTING.md"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0101",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-01.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0102",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0201",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-02.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0202",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0301",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-04.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0401",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-04.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0402",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-05.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0501",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-05.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0502",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-06.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0601",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-06.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0602",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-06.03",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0603",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-QA-07.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0701",
+      "evidence": [
+        "Catalog.lock",
+        "Syrox.lock",
+        "tests/test-qualification-hosts.py"
+      ],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-SA-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0101",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-SA-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0201",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-SA-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0301",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-SA-03.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0302",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-01.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0101",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-02.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0201",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-03.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0301",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-04.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0401",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-04.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0402",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-05.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0501",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-05.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0502",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-05.03",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0503",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-06.01",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0601",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    },
+    {
+      "requirement": "OSPS-VM-06.02",
+      "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0602",
+      "evidence": ["SECURITY.md", "docs/automation.md"],
+      "owner": "@fullzer4",
+      "status": "partial-unverified",
+      "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
+    }
+  ]
+}

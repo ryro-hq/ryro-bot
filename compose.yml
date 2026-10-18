@@ -1,0 +1,57 @@
+name: ryro-bot
+services:
+  postgres:
+    image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
+    environment:
+      POSTGRES_USER: ryro_bot
+      POSTGRES_DB: ryro_bot
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes: [postgres:/var/lib/postgresql]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U ryro_bot -d ryro_bot]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+    networks: [database]
+  bot:
+    build: .
+    image: ryro-bot:${RYRO_BOT_VERSION:?Set the reviewed image revision}
+    environment:
+      HOST: 0.0.0.0
+      PORT: '8790'
+      RYRO_MODE: ${RYRO_MODE:-observe}
+      RYRO_POLICY_REVISION: ${RYRO_POLICY_REVISION:?Set the pinned policy SHA}
+      RYRO_BOT_VERSION: ${RYRO_BOT_VERSION:?Set the source SHA}
+      RYRO_LOCAL_DATABASE: 'true'
+      RYRO_BINDINGS_FILE: /etc/ryro-bot/bindings.json
+      DATABASE_URL_FILE: /run/secrets/database_url
+      GITHUB_WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
+      GITHUB_APP_ID: ${GITHUB_APP_ID:-}
+      GITHUB_APP_LOGIN: ${GITHUB_APP_LOGIN:-}
+      GITHUB_APP_KEY_FILE: ${GITHUB_APP_KEY_FILE:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+    secrets: [database_url, webhook_secret]
+    # Put app.pem in this operator-owned directory, mode 0440/group 1000.
+    volumes:
+      - ./deploy/bindings.json:/etc/ryro-bot/bindings.json:ro
+      - ./secrets:/etc/ryro-bot/secrets:ro
+    ports: [127.0.0.1:8790:8790]
+    read_only: true
+    tmpfs: [/tmp:size=32m, noexec, nosuid, nodev]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    init: true
+    restart: unless-stopped
+    networks: [database, outbound]
+volumes:
+  postgres:
+networks:
+  database: { internal: true }
+  outbound:
+secrets:
+  postgres_password: { file: ./secrets/postgres-password }
+  database_url: { file: ./secrets/database-url }
+  webhook_secret: { file: ./secrets/webhook-secret }

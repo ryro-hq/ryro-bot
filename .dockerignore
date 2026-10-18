@@ -1,0 +1,11 @@
+.git
+node_modules
+dist
+coverage
+secrets
+evidence
+backups
+.env*
+bindings.json
+deploy/bindings.json
+*.pem

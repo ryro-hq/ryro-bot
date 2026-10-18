@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "projects": [
+    {
+      "repository": "ryro-hq/syrox-pkgs",
+      "policy": "syrox-pkgs-v1",
+      "baseBranch": "main",
+      "fallback": ["@fullzer4"],
+      "independentReviewers": [],
+      "categories": {
+        "web": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "development": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "libraries": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "examples": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "bootstrap": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "platform": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "systemd": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "automation": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        },
+        "security": {
+          "owners": ["@fullzer4"],
+          "deputies": []
+        }
+      },
+      "packages": {
+        "nginx": {
+          "category": "web",
+          "owners": [],
+          "deputies": [],
+          "paths": [
+            "recipes/packages/nginx/*",
+            "recipes/*nginx*",
+            "integrations/nginx.srx"
+          ],
+          "profiles": ["minimal"],
+          "discovery": {
+            "url": "https://nginx.org/download/",
+            "origin": "https://nginx.org/",
+            "format": "html",
+            "prefix": "nginx-",
+            "suffix": ".tar.gz",
+            "classification": "even-minor"
+          }
+        },
+        "hello": {
+          "category": "examples",
+          "owners": [],
+          "deputies": [],
+          "paths": ["recipes/packages/hello/*", "recipes/*hello*"],
+          "profiles": ["default"],
+          "discovery": {
+            "url": "https://ftp.gnu.org/gnu/hello/",
+            "origin": "https://ftp.gnu.org/",
+            "format": "html",
+            "prefix": "hello-",
+            "suffix": ".tar.gz",
+            "classification": "numeric"
+          }
+        },
+        "glibc": {
+          "category": "libraries",
+          "owners": [],
+          "deputies": [],
+          "paths": ["recipes/packages/glibc/*", "recipes/*glibc*", "keys/*"],
+          "profiles": ["default"]
+        },
+        "git": {
+          "category": "development",
+          "owners": [],
+          "deputies": [],
+          "paths": [
+            "recipes/packages/git/*",
+            "recipes/git.srx",
+            "integrations/git.srx"
+          ],
+          "profiles": ["default"]
+        },
+        "zlib": {
+          "category": "libraries",
+          "owners": [],
+          "deputies": [],
+          "paths": ["recipes/packages/zlib/*", "recipes/zlib.srx"],
+          "profiles": ["default"]
+        },
+        "bootstrap": {
+          "category": "bootstrap",
+          "owners": [],
+          "deputies": [],
+          "paths": [
+            "recipes/packages/bootstrap/*",
+            "recipes/bootstrap.srx",
+            "assets/bootstrap*"
+          ],
+          "profiles": ["default"]
+        }
+      },
+      "shared": [
+        {
+          "paths": [
+            "toolchains/*",
+            "std/*",
+            "recipes/toolchain.srx",
+            "recipes/managed_build.srx",
+            "recipes/runtime_tools.srx"
+          ],
+          "categories": ["platform"],
+          "affectsAll": true
+        },
+        {
+          "paths": ["integrations/*", "tests/integrations.rs"],
+          "categories": ["systemd"],
+          "affectsAll": false
+        },
+        {
+          "paths": [".github/*", "scripts/*", "governance/*"],
+          "categories": ["automation", "security"],
+          "affectsAll": false
+        },
+        {
+          "paths": ["security/*", "keys/*", "SECURITY.md"],
+          "categories": ["security"],
+          "affectsAll": true
+        },
+        {
+          "paths": ["main.srx", "catalog.toml", "Catalog.lock", "Syrox.lock"],
+          "categories": ["platform"],
+          "affectsAll": true
+        },
+        {
+          "paths": [
+            ".ryro-bot.toml",
+            ".syrox-core",
+            "hosts/*",
+            "recipes/templates/*",
+            "recipes/lib/*",
+            "recipes/support.srx"
+          ],
+          "categories": ["automation", "security", "platform"],
+          "affectsAll": true
+        },
+        {
+          "paths": [
+            "recipes/packages/*/integration.srx",
+            "recipes/packages/*/contracts/*"
+          ],
+          "categories": ["systemd"],
+          "affectsAll": false
+        }
+      ],
+      "limits": {
+        "versionsPerBatch": 5,
+        "openPrs": 4,
+        "combinations": 4096,
+        "catalogBytes": 4194304,
+        "lockBytes": 4194304,
+        "estimatedBytesPerCombination": 4096,
+        "actionsMatrixRows": 256
+      },
+      "requiredChecks": ["qualify / success", "DCO / DCO"],
+      "hosts": ["debian", "ubuntu-24.04"],
+      "preparationWorkflow": "ryro-prepare.yml",
+      "qualificationWorkflow": "catalog.yml",
+      "publicationEnabled": false
+    }
+  ]
+}
