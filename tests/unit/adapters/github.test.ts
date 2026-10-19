@@ -108,7 +108,7 @@ describe('GitHub capability and credential boundaries', () => {
           token: 'installation',
           repositories: [{ id: 7 }],
         });
-      if (url.includes('api.github.com'))
+      if (new URL(url).hostname === 'api.github.com')
         return new Response(null, {
           status: 302,
           headers: {

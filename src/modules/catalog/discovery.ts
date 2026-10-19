@@ -135,7 +135,8 @@ export const discover = (
     );
   });
 const decode = (text: string) =>
-  text
-    .replace(/&amp;/g, '&')
-    .replace(/&#(\d+);/g, (_, n: string) => String.fromCodePoint(Number(n)))
-    .replace(/&quot;/g, '"');
+  text.replace(/&(?:amp|quot|#\d+);/g, (entity) => {
+    if (entity === '&amp;') return '&';
+    if (entity === '&quot;') return '"';
+    return String.fromCodePoint(Number(entity.slice(2, -1)));
+  });
