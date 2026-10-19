@@ -7,5 +7,4 @@ evidence
 backups
 .env*
 bindings.json
-deploy/bindings.json
 *.pem

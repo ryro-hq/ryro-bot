@@ -9,6 +9,4 @@ evidence/
 backups/
 *.pem
 
-/deploy/bindings.json
-__pycache__/
-*.pyc
+/bindings.json
