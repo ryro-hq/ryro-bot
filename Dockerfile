@@ -9,6 +9,8 @@ RUN npm run build && npm prune --omit=dev --ignore-scripts --no-audit --no-fund
 FROM node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5
 WORKDIR /app
 ENV NODE_ENV=production
+ARG RYRO_BOT_VERSION
+ENV RYRO_BOT_VERSION=${RYRO_BOT_VERSION}
 ENV HOST=0.0.0.0 PORT=8790
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
