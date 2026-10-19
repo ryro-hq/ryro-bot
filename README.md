@@ -8,21 +8,24 @@ GitHub App for Ryro open source maintenance: CI coordination, package catalog
 updates and review routing. Built with TypeScript, Effect and PostgreSQL; the
 initial pilot is `ryro-hq/srx-pkgs`. Default mode: `observe`.
 
-## Rules and responsibilities
+## Repositories
+
+The [project registry](registry/projects.json) currently configures one repository:
+
+| Repository                                              | What the bot does                                                                                                           | Current rollout                                        |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| [ryro-hq/srx-pkgs](https://github.com/ryro-hq/srx-pkgs) | Tracks CI runs, discovers `nginx` and `hello` releases, plans catalog updates and selects reviewers based on changed paths. | `observe` by default; catalog PR publication disabled. |
+
+In write modes, the bot can dispatch preparation and qualification workflows
+and open draft PRs when the project's publication gate allows it. It never
+approves or merges PRs.
+
+## Contribution rules
 
 Contributions use scoped Conventional Commits and the author's DCO sign-off.
 Pull requests require `verify` and `DCO`, resolved conversations and the merge
 queue, which rebases one PR at a time. While there is one maintainer, approvals
 are temporarily not required; see the [review policy](CONTRIBUTING.md#review-and-merge-queue).
-
-| Component                      | Responsibility                                                                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime GitHub App             | Coordinates maintenance and routes reviews; write modes can prepare changes and open gated draft PRs. Never approves or merges. |
-| CI                             | Checks code and the production image on PRs and merge groups; validates PR commit messages.                                     |
-| DCO2 App                       | Checks contributor sign-offs before queue admission.                                                                            |
-| Maintainer and merge queue     | Review changes, choose when to integrate and require checks on the combined code.                                               |
-| Release Please and release App | Maintain the version PR, then create the version tag and GitHub Release after integration.                                      |
-| Publish container              | Builds the tagged source and pushes the versioned image to GHCR using `GITHUB_TOKEN`.                                           |
 
 The CI badge shows checks on `main`; the DCO and license badges describe project
 policies. Version and image badges will be added after the first verified public
