@@ -12,6 +12,7 @@
     "erasableSyntaxOnly": true,
     "moduleDetection": "force",
     "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitOverride": true,

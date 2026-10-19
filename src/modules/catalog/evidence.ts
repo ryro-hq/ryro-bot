@@ -272,12 +272,14 @@ export function publicationReady(
       const rows = e.qualifications.filter(
         (q) => q.host === host && q.system === system,
       );
+      const [qualification] = rows;
       requireThat(
         rows.length === 1 &&
-          rows[0].passed &&
-          rows[0].artifactSha256 === expected.artifactSha256 &&
+          qualification &&
+          qualification.passed &&
+          qualification.artifactSha256 === expected.artifactSha256 &&
           /^[0-9a-f]{64}$/.test(expected.environments[host] ?? '') &&
-          rows[0].environmentDigest === expected.environments[host],
+          qualification.environmentDigest === expected.environments[host],
         'missing-or-wrong-environment-qualification',
       );
     }

@@ -109,7 +109,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
           return yield* sql`SELECT to_regclass('rollback_probe') AS name`;
         }),
       );
-      expect(rows[0].name).toBeNull();
+      expect(rows[0]?.name).toBeNull();
     });
   },
 );

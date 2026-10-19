@@ -7,10 +7,10 @@ export function versionCompare(a: string, b: string): number {
   const left = a.match(/\d+|\D+/g) ?? [],
     right = b.match(/\d+|\D+/g) ?? [];
   for (let i = 0; i < Math.max(left.length, right.length); i++) {
-    if (left[i] === undefined) return -1;
-    if (right[i] === undefined) return 1;
     const x = left[i],
       y = right[i];
+    if (x === undefined) return -1;
+    if (y === undefined) return 1;
     const result =
       /^\d+$/.test(x) && /^\d+$/.test(y)
         ? BigInt(x) > BigInt(y)
@@ -85,6 +85,7 @@ export function plan(
     for (let i = 0; i < rows.length; i += project.limits.versionsPerBatch) {
       const selected = rows.slice(i, i + project.limits.versionsPerBatch),
         first = selected[0];
+      requireThat(first, 'empty-update-batch');
       const systems = new Set(
         admitted
           .filter(
@@ -178,7 +179,8 @@ export function reconcile(
   ).length;
   return batches.map((batch) => {
     const prs = snapshot.prs.filter((p) => p.batchId === batch.id),
-      branch = snapshot.branches[batch.id];
+      branch = snapshot.branches[batch.id],
+      [pr] = prs;
     let action: string;
     if (prs.some((p) => p.state === 'closed')) action = 'respect-closed';
     else if (prs.length > 1) action = 'conflict';
@@ -191,8 +193,7 @@ export function reconcile(
         branch.baseSha !== batch.baseSha)
     )
       action = 'preserve-human-work';
-    else if (prs.length) {
-      const pr = prs[0];
+    else if (pr) {
       if (!branch || pr.author !== login || pr.headSha !== branch.headSha)
         action = 'preserve-human-work';
       else if (pr.checksSha === pr.headSha && pr.checks === 'success')

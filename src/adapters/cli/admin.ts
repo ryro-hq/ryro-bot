@@ -30,11 +30,12 @@ export const adminProgram = (argv: string[], env = process.env) =>
         ),
       );
       requireThat(project, 'unregistered-project');
-      if (command === 'route')
+      if (command === 'route') {
+        requireThat(args[0], 'author-required');
         yield* Console.log(
           JSON.stringify(route(project, args.slice(1), args[0]), null, 2),
         );
-      else {
+      } else {
         requireThat(args[0], 'destination-required');
         for (const [path, bytes] of Object.entries(
           ownershipArtifacts(project),
@@ -73,7 +74,10 @@ export const adminProgram = (argv: string[], env = process.env) =>
       }
       yield* checkMigrations;
       if (command === 'status') yield* adminStatus;
-      else yield* administer(command, repository, args, loadAdminSettings(env));
+      else {
+        requireThat(repository, 'repository-required');
+        yield* administer(command, repository, args, loadAdminSettings(env));
+      }
     }).pipe(
       Effect.provide(
         databaseLayer(db.databaseUrl, db.databaseCa, db.localDatabase),

@@ -234,7 +234,7 @@ export class GitHub {
     );
     requireThat(
       result.repositories?.length === 1 &&
-        result.repositories[0].id === this.binding.repositoryId &&
+        result.repositories[0]?.id === this.binding.repositoryId &&
         result.token,
       'unscoped-installation-token',
     );

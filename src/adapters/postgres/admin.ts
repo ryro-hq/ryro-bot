@@ -58,12 +58,13 @@ export const administer = (
         {},
       );
     else if (command === 'discover') {
+      const [pkg] = args;
       requireThat(
-        project.packages[args[0]]?.discovery,
+        pkg && project.packages[pkg]?.discovery,
         'unknown-discovery-channel',
       );
       yield* enqueue(repository, 'discover', 'admin:' + crypto.randomUUID(), {
-        package: args[0],
+        package: pkg,
       });
     } else if (command === 'inventory') {
       let pkg = '',
@@ -81,7 +82,10 @@ export const administer = (
     } else if (command === 'hold') {
       const [pkg, version, state, ...reason] = args;
       requireThat(
-        ['blocked', 'revoked', 'quarantined'].includes(state) &&
+        pkg &&
+          version &&
+          state &&
+          ['blocked', 'revoked', 'quarantined'].includes(state) &&
           reason.join(' ').length >= 12,
         'hold-state-and-reason-required',
       );
@@ -92,7 +96,8 @@ export const administer = (
       const [batchId, text] = args,
         runId = Number(text);
       requireThat(
-        /^[0-9a-f]{64}$/.test(batchId) &&
+        batchId &&
+          /^[0-9a-f]{64}$/.test(batchId) &&
           Number.isSafeInteger(runId) &&
           runId > 0 &&
           binding &&
@@ -129,9 +134,13 @@ export const administer = (
       const matches = artifacts.filter(
         (a) => !a.expired && a.name === 'prepared-' + batchId + '-' + runId,
       );
-      requireThat(matches.length === 1, 'recovery-artifact-missing');
+      const [artifact] = matches;
+      requireThat(
+        matches.length === 1 && artifact,
+        'recovery-artifact-missing',
+      );
       const bytes = yield* remote(() =>
-        api.artifact(matches[0].id, matches[0].digest),
+        api.artifact(artifact.id, artifact.digest),
       );
       // The artifact binds this run to the exact batch, environment, policy and base.
       yield* Effect.sync(() =>

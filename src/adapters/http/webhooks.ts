@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
-import type { IncomingMessage } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { Effect, Redacted } from 'effect';
 import { BotError, requireThat } from '../../kernel/errors.ts';
 import type { Settings } from '../../app/config/service.ts';
@@ -76,7 +76,7 @@ export function webhookServer(
   ) => Promise<unknown>,
   healthy: () => Promise<unknown>,
 ) {
-  const server = createServer(async (request, response) => {
+  const handle = async (request: IncomingMessage, response: ServerResponse) => {
     try {
       if (request.method === 'GET' && request.url === '/healthz') {
         await healthy();
@@ -117,6 +117,9 @@ export function webhookServer(
                 : 503;
       response.writeHead(status).end();
     }
+  };
+  const server = createServer((request, response) => {
+    void handle(request, response).catch(() => response.destroy());
   });
   server.requestTimeout = 15000;
   server.headersTimeout = 10000;

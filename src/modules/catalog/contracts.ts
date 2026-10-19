@@ -81,6 +81,7 @@ export class PageFetcher extends Context.Service<
   PageFetcher,
   {
     fetch(
+      this: void,
       url: string,
       authority: string,
       signal?: AbortSignal,

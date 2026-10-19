@@ -67,8 +67,11 @@ export function parsePage(
   }
   for (const match of (headers.get('link') ?? '').matchAll(
     /<([^>]+)>\s*;\s*rel\s*=\s*"?next"?/gi,
-  ))
-    next.add(sameOrigin(new URL(match[1], url).href, channel.origin));
+  )) {
+    const target = match[1];
+    requireThat(target, 'invalid-pagination-link');
+    next.add(sameOrigin(new URL(target, url).href, channel.origin));
+  }
   requireThat(next.size <= 1, 'ambiguous-pagination');
   return { versions: [...versions.values()], next: [...next][0] ?? null };
 }

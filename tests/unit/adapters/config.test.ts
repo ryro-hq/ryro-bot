@@ -111,3 +111,13 @@ it('shows help without loading credentials and routes with only the registry', a
     ),
   ).resolves.toBeUndefined();
 });
+it('rejects review routing without an author before loading database or App credentials', async () => {
+  const { env } = configuration();
+  await expect(
+    Effect.runPromise(
+      adminProgram(['route', 'owner/app'], {
+        RYRO_REGISTRY: env.RYRO_REGISTRY,
+      }).pipe(Effect.provide(NodeServices.layer)),
+    ),
+  ).rejects.toThrow('author-required');
+});

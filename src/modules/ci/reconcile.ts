@@ -18,6 +18,7 @@ export const reconcileCI = (
     const api = provider.forRepository(project.repository, signal, job);
     const store = yield* CIStore;
     const binding = settings.bindings[project.repository];
+    requireThat(binding, 'github-binding-required');
     const observe = (id: number) =>
       Effect.gen(function* () {
         // Webhooks are hints. Read the authoritative attempt and state, including reruns.

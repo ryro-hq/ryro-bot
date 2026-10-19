@@ -3,6 +3,7 @@ import { Effect, Layer } from 'effect';
 import { SqlClient } from 'effect/sql';
 import { CIStore } from '../../modules/ci/contracts.ts';
 import type { Pull, Run } from '../../modules/ci/model.ts';
+import { requireThat } from '../../kernel/errors.ts';
 export const ciStoreLayer = Layer.effect(
   CIStore,
   Effect.gen(function* () {
@@ -40,6 +41,7 @@ export const ciStoreLayer = Layer.effect(
             page: number;
             complete: boolean;
           }>`SELECT page,complete FROM pull_scans WHERE repository=${repository}`;
+          requireThat(row, 'pull-scan-not-found');
           return row;
         }),
       page: (repository, page, pulls) =>

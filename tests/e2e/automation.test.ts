@@ -1,4 +1,5 @@
 import { createHmac, randomUUID } from 'node:crypto';
+import assert from 'node:assert/strict';
 import { Effect, Redacted } from 'effect';
 import { SqlClient } from 'effect/sql';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -30,6 +31,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       repositoryId: 7,
       aliases: [],
     };
+    assert.ok(project.packages.nginx);
     project.packages = { nginx: project.packages.nginx };
     const settings: Settings = {
       mode: 'prepare',
@@ -142,7 +144,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
           return yield* sql`SELECT count(*)::int AS count FROM deliveries`;
         }),
       );
-      expect(deliveries[0].count).toBe(1);
+      expect(deliveries[0]?.count).toBe(1);
     });
     it('discovers versions, prepares once and releases the worker while CI runs', async () => {
       await run(
@@ -156,7 +158,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       );
       expect(batches).toHaveLength(1);
       expect(batches[0]).toMatchObject({ run_id: '42', status: 'preparing' });
-      expect(batches[0].intent.versions).toEqual(['2.0.0', '2.1.0-rc1']);
+      expect(batches[0]?.intent.versions).toEqual(['2.0.0', '2.1.0-rc1']);
       expect(api.calls.filter((c) => c.startsWith('DISPATCH'))).toHaveLength(1);
       expect(api.calls).not.toContain('ARTIFACT');
       expect(await execute()).toBe(false);
@@ -168,6 +170,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       const [batch] = await run(
         Effect.flatMap(CatalogStore, (s) => s.batches(project.repository)),
       );
+      assert.ok(batch);
       api.complete(batch.intent, 2);
       await webhook('workflow_run', {
         workflow_run: { id: 42, run_attempt: 1, status: 'queued' },
@@ -179,6 +182,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       const [prepared] = await run(
         Effect.flatMap(CatalogStore, (s) => s.batches(project.repository)),
       );
+      assert.ok(prepared);
       expect(prepared.status).toBe('prepared');
       expect(prepared.evidence_digest).toMatch(/^[a-f0-9]{64}$/);
       const evidence = await run(
@@ -226,7 +230,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
           }>`SELECT evidence FROM audit WHERE operation='review-routing' ORDER BY id DESC LIMIT 1`;
         }),
       );
-      expect(rows[0].evidence).toMatchObject({
+      expect(rows[0]?.evidence).toMatchObject({
         reviewers: [],
         independentReviewerPending: true,
       });
@@ -242,6 +246,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
           },
         ],
       });
+      assert.ok(ciProject);
       const ciRegistry = builtinModules({
         ...settings,
         projects: [ciProject],
