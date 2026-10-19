@@ -26,6 +26,11 @@ obtain fresh approval after new commits. The App never approves or merges.
 With only `@fullzer4` registered, their changes wait for another human; an empty
 deputy or independent reviewer list is an acknowledged governance gap.
 
+After approval, add the PR to the merge queue. Quality, tests and the production
+build run against the combined SHA before the queue rebases one PR at a time.
+DCO sign-offs and individual commit messages are preserved; squash and merge commits are disabled.
+DCO and commit subjects are checked on each PR before queue admission.
+
 Changes to registry, workflows, permissions, rollout gates and security policy
 require explicit security review. Rules for a proposed change are loaded from
 its base commit. Editing `.ryro-bot.toml` in a PR does not change its own rules.
