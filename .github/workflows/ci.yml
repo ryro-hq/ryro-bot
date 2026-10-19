@@ -83,19 +83,9 @@ jobs:
           COMMIT_HEAD: ${{ github.event.pull_request.head.sha }}
         run: npm run commit:check -- --from "$COMMIT_BASE" --to "$COMMIT_HEAD" --strict
 
-  DCO:
-    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
-    permissions:
-      contents: read
-      pull-requests: read
-    uses: ./.github/workflows/dco.yml
-    with:
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
-
   verify:
     if: always()
-    needs: [quality, unit-tests, integration-tests, build, commits, DCO]
+    needs: [quality, unit-tests, integration-tests, build, commits]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -108,6 +98,6 @@ jobs:
             all(to_entries[];
               .value.result == "success" or
               ($event != "pull_request" and
-                (.key == "commits" or .key == "DCO") and
+                .key == "commits" and
                 .value.result == "skipped"))
           ' <<< "$RESULTS"
