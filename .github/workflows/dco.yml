@@ -1,39 +1,21 @@
 name: DCO
+
 on:
   workflow_call:
     inputs:
       base_sha: { required: true, type: string }
       head_sha: { required: true, type: string }
+
 permissions:
   contents: read
+  pull-requests: read
+
 jobs:
   DCO:
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: KineticCafe/actions-dco@5f160e3ee086af8fc0fb567b8add0937d074123e # v3.2.0
         with:
-          fetch-depth: 0
-          ref: ${{ inputs.head_sha }}
-          persist-credentials: false
-      - name: Verify contributor sign-offs without running project code
-        env:
-          BASE_SHA: ${{ inputs.base_sha }}
-          HEAD_SHA: ${{ inputs.head_sha }}
-        run: |
-          python3 - <<'PY'
-          import os, re, subprocess
-          base, head = os.environ['BASE_SHA'], os.environ['HEAD_SHA']
-          assert all(re.fullmatch(r'[a-f0-9]{40}', sha) for sha in [base, head])
-          subprocess.run(['git', 'merge-base', '--is-ancestor', base, head], check=True)
-          commits = subprocess.check_output(['git', 'rev-list', base + '..' + head], text=True).splitlines()
-          assert 1 <= len(commits) <= 1000
-          missing = []
-          for commit in commits:
-              author = subprocess.check_output(['git', 'show', '-s', '--format=%an <%ae>', commit], text=True).strip()
-              message = subprocess.check_output(['git', 'show', '-s', '--format=%B', commit], text=True)
-              trailers = subprocess.check_output(['git', 'interpret-trailers', '--parse'], input=message, text=True).splitlines()
-              if not any(line.lower() == ('Signed-off-by: ' + author).lower() for line in trailers):
-                  missing.append(commit)
-          if missing:
-              raise SystemExit('Missing author DCO sign-off for commits: ' + ', '.join(missing))
-          PY
+          config: |
+            bot.policy = "none"

@@ -25,14 +25,12 @@ jobs:
           ref: ${{ inputs.policy_revision }}
           path: .ryro-bot
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: ./.ryro-bot/.github/actions/node
         with:
-          node-version: '24'
+          working-directory: .ryro-bot
       - name: Build the pinned preparation entry point
         working-directory: .ryro-bot
-        run: |
-          npm ci --ignore-scripts
-          npm run build
+        run: npm run build
       - uses: ./.github/actions/core
       - name: Prepare bounded changes without write credentials
         env:

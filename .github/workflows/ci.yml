@@ -1,22 +1,47 @@
-name: Bot
+name: CI
+
 on:
   pull_request:
   push:
     branches: [main]
+  merge_group:
+    types: [checks_requested]
+  workflow_dispatch:
+
 permissions:
   contents: read
+
 concurrency:
-  group: bot-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'merge_group' }}
+
 jobs:
-  DCO:
-    if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/dco.yml
-    with:
-      base_sha: ${{ github.event.pull_request.base.sha }}
-      head_sha: ${{ github.event.pull_request.head.sha }}
-  verify:
+  quality:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { persist-credentials: false }
+      - uses: ./.github/actions/node
+      - name: Format and type checking
+        run: |
+          npm run format:check
+          npm run check
+      - name: Dependency policy
+        run: npm audit --omit=dev
+
+  unit-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { persist-credentials: false }
+      - uses: ./.github/actions/node
+      - run: npm run test:unit
+
+  integration-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
@@ -29,15 +54,62 @@ jobs:
       TEST_DATABASE_URL: postgres://postgres:local-test-only@127.0.0.1:5432/ryro_bot_test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { persist-credentials: false }
+      - uses: ./.github/actions/node
+      - run: npm run test:integration
+
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { persist-credentials: false }
+      - name: Build the production image
+        run: docker build --tag ryro-bot:ci .
+      - name: Check compiled entry points without development dependencies
+        run: |
+          docker run --rm --read-only --cap-drop ALL ryro-bot:ci node dist/admin.js --help
+          docker run --rm --read-only --cap-drop ALL ryro-bot:ci node dist/migrate.js --help
+
+  commits:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { persist-credentials: false, fetch-depth: 0 }
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with: { node-version: '24', cache: npm }
-      - run: npm ci --ignore-scripts
-      - name: Validate commit messages
-        if: github.event_name == 'pull_request'
+      - uses: ./.github/actions/node
+      - name: Conventional commits
         env:
           COMMIT_BASE: ${{ github.event.pull_request.base.sha }}
           COMMIT_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: npm run commit:check -- --from "$COMMIT_BASE" --to "$COMMIT_HEAD"
-      - run: npm run verify
-      - run: npm audit --omit=dev
+        run: npm run commit:check -- --from "$COMMIT_BASE" --to "$COMMIT_HEAD" --strict
+
+  DCO:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/dco.yml
+    with:
+      base_sha: ${{ github.event.pull_request.base.sha }}
+      head_sha: ${{ github.event.pull_request.head.sha }}
+
+  verify:
+    if: always()
+    needs: [quality, unit-tests, integration-tests, build, commits, DCO]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every mandatory job to succeed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          jq --exit-status --arg event "$EVENT_NAME" '
+            all(to_entries[];
+              .value.result == "success" or
+              ($event != "pull_request" and
+                (.key == "commits" or .key == "DCO") and
+                .value.result == "skipped"))
+          ' <<< "$RESULTS"
