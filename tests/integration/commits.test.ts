@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
   mkdtempSync,
+  mkdirSync,
   readFileSync,
   rmSync,
   symlinkSync,
@@ -56,11 +57,24 @@ function fixture() {
     JSON.stringify({
       private: true,
       type: 'module',
-      scripts: { 'commit:check': 'commitlint' },
+      scripts: Object.fromEntries(
+        ['commit:check', 'quality', 'format:check', 'lint', 'check'].map(
+          (name) => [name, configuration.scripts[name]],
+        ),
+      ),
       'simple-git-hooks': configuration['simple-git-hooks'],
       commitlint: configuration.commitlint,
     }),
   );
+  for (const name of ['tsconfig.json', '.oxlintrc.json', '.oxfmtrc.json'])
+    writeFileSync(join(cwd, name), readFileSync(join(root, name)));
+  mkdirSync(join(cwd, 'src'));
+  writeFileSync(join(cwd, 'src/input.ts'), 'export const value = 1;\n');
+  execFileSync(resolve(root, 'node_modules/.bin/oxfmt'), ['.'], {
+    cwd,
+    env,
+    stdio: 'pipe',
+  });
   const commit = (subject: string) =>
     git(
       '-c',
@@ -101,6 +115,42 @@ it('accepts scoped subjects, breaking changes and DCO trailers through commitlin
   f.commit('feat(api)!: mudar contrato');
   expect(f.check().status).toBe(0);
 });
+
+it('blocks commits with formatting, lint or TypeScript errors through the managed pre-commit hook', () => {
+  const f = fixture();
+  expect(
+    spawnSync(process.execPath, [installer], { cwd: f.cwd, env }).status,
+  ).toBe(0);
+  expect(readFileSync(join(f.cwd, '.git/hooks/pre-commit'), 'utf8')).toContain(
+    'npm run quality',
+  );
+  for (const [source, expected] of [
+    ['export const value={a:1}\n', 'format'],
+    ['export const value = NaN === NaN;\n', 'use-isnan'],
+    ["export const value: number = 'invalid';\n", 'TS2322'],
+  ] as const) {
+    writeFileSync(join(f.cwd, 'src/input.ts'), source);
+    const result = spawnSync(
+      'git',
+      [
+        'commit',
+        '--allow-empty',
+        '-qsm',
+        'fix(quality): validate repository gates',
+      ],
+      {
+        cwd: f.cwd,
+        env,
+        encoding: 'utf8',
+      },
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stdout + result.stderr).toContain(expected);
+    expect(f.git('rev-parse', 'HEAD')).toBe(f.base);
+  }
+  writeFileSync(join(f.cwd, 'src/input.ts'), 'export const value = 1;\n');
+  f.git('commit', '--allow-empty', '-qsm', 'fix(quality): accept valid source');
+}, 15000);
 it('rejects missing types, scopes, separators and descriptions in every new commit', () => {
   const f = fixture();
   for (const subject of [
@@ -143,4 +193,4 @@ it('installs the managed hook, blocks an actual invalid commit and detects local
   f.commit('commit sem padrão');
   f.git('commit', '--allow-empty', '-qsm', 'docs(repo): atualizar instruções');
   expect(f.check().status).not.toBe(0);
-});
+}, 15000);
