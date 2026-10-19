@@ -1,4 +1,5 @@
-# Configuration for https://github.com/dcoapp/app.
+# Configuration for https://github.com/cncf/dco2 (read from the default branch).
+allowOverrideAction: false
 require:
   members: true
 allowRemediationCommits:
