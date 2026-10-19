@@ -14,7 +14,7 @@ with the reporter before disclosure. Bots do not forward reports to upstream.
 An incident can be contained by setting `RYRO_MODE=observe`, stopping the service
 and revoking the App key/installation tokens. Check audit records and all remote
 branches/PRs; preserve human commits. Restore from a verified off-host backup and
-resume observation before enabling operations. See `docs/operations.md`.
+resume observation before enabling operations. See [container setup](README.md#container).
 
 Blocking a discovered release in the bot prevents planning only. It does not
 revoke installed/cached bytes. Production publication remains disabled until

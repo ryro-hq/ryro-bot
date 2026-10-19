@@ -19,5 +19,7 @@ Changes to registry, workflows, permissions, rollout gates and security policy
 require explicit security review. Rules for a proposed change are loaded from
 its base commit. Editing `.ryro-bot.toml` in a PR does not change its own rules.
 
-For upstream patches, use the [DEP-3 record](docs/upstream-patches.md). Do not send
-an upstream report automatically or disclose an embargoed issue in a public PR.
+For upstream patches, include DEP-3 metadata, source and patch digests, a minimal
+reproduction, tests before/after and a removal condition. Preserve attribution
+and licenses. A maintainer reviews patches before forwarding them through the
+upstream project's process. Keep embargoed reports private.

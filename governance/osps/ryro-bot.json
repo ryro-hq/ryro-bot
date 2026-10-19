@@ -9,10 +9,9 @@
       "requirement": "OSPS-AC-01.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0101",
       "evidence": [
-        "src/github.ts",
-        "src/webhook.ts",
-        "deploy/github-app-manifest.json",
-        "governance/ACCESS.md"
+        "src/adapters/github/client.ts",
+        "src/adapters/http/webhooks.ts",
+        "README.md"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -22,10 +21,9 @@
       "requirement": "OSPS-AC-02.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0201",
       "evidence": [
-        "src/github.ts",
-        "src/webhook.ts",
-        "deploy/github-app-manifest.json",
-        "governance/ACCESS.md"
+        "src/adapters/github/client.ts",
+        "src/adapters/http/webhooks.ts",
+        "README.md"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -35,10 +33,9 @@
       "requirement": "OSPS-AC-03.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0301",
       "evidence": [
-        "src/github.ts",
-        "src/webhook.ts",
-        "deploy/github-app-manifest.json",
-        "governance/ACCESS.md"
+        "src/adapters/github/client.ts",
+        "src/adapters/http/webhooks.ts",
+        "README.md"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -48,10 +45,9 @@
       "requirement": "OSPS-AC-03.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0302",
       "evidence": [
-        "src/github.ts",
-        "src/webhook.ts",
-        "deploy/github-app-manifest.json",
-        "governance/ACCESS.md"
+        "src/adapters/github/client.ts",
+        "src/adapters/http/webhooks.ts",
+        "README.md"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -61,10 +57,9 @@
       "requirement": "OSPS-AC-04.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0401",
       "evidence": [
-        "src/github.ts",
-        "src/webhook.ts",
-        "deploy/github-app-manifest.json",
-        "governance/ACCESS.md"
+        "src/adapters/github/client.ts",
+        "src/adapters/http/webhooks.ts",
+        "README.md"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -74,10 +69,9 @@
       "requirement": "OSPS-AC-04.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-ac-0402",
       "evidence": [
-        "src/github.ts",
-        "src/webhook.ts",
-        "deploy/github-app-manifest.json",
-        "governance/ACCESS.md"
+        "src/adapters/github/client.ts",
+        "src/adapters/http/webhooks.ts",
+        "README.md"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -89,7 +83,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -101,7 +95,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -113,7 +107,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -125,7 +119,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -137,7 +131,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -149,7 +143,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -161,7 +155,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -173,7 +167,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -185,7 +179,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -197,7 +191,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -209,7 +203,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -221,7 +215,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -233,7 +227,7 @@
       "evidence": [
         ".github/workflows/ci.yml",
         ".github/workflows/prepare.yml",
-        "src/evidence.ts"
+        "src/modules/catalog/evidence.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -242,7 +236,7 @@
     {
       "requirement": "OSPS-DO-01.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0101",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -250,7 +244,7 @@
     {
       "requirement": "OSPS-DO-02.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0201",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -258,7 +252,7 @@
     {
       "requirement": "OSPS-DO-03.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0301",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -266,7 +260,7 @@
     {
       "requirement": "OSPS-DO-03.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0302",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -274,7 +268,7 @@
     {
       "requirement": "OSPS-DO-04.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0401",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -282,7 +276,7 @@
     {
       "requirement": "OSPS-DO-05.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0501",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -290,7 +284,7 @@
     {
       "requirement": "OSPS-DO-06.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0601",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -298,7 +292,7 @@
     {
       "requirement": "OSPS-DO-07.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-do-0701",
-      "evidence": ["README.md", "docs/operations.md", "SECURITY.md"],
+      "evidence": ["README.md", "SECURITY.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -306,11 +300,7 @@
     {
       "requirement": "OSPS-GV-01.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0101",
-      "evidence": [
-        "CONTRIBUTING.md",
-        "governance/ACCESS.md",
-        "registry/projects.json"
-      ],
+      "evidence": ["CONTRIBUTING.md", "registry/projects.json"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -318,11 +308,7 @@
     {
       "requirement": "OSPS-GV-01.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0102",
-      "evidence": [
-        "CONTRIBUTING.md",
-        "governance/ACCESS.md",
-        "registry/projects.json"
-      ],
+      "evidence": ["CONTRIBUTING.md", "registry/projects.json"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -330,11 +316,7 @@
     {
       "requirement": "OSPS-GV-02.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0201",
-      "evidence": [
-        "CONTRIBUTING.md",
-        "governance/ACCESS.md",
-        "registry/projects.json"
-      ],
+      "evidence": ["CONTRIBUTING.md", "registry/projects.json"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -342,11 +324,7 @@
     {
       "requirement": "OSPS-GV-03.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0301",
-      "evidence": [
-        "CONTRIBUTING.md",
-        "governance/ACCESS.md",
-        "registry/projects.json"
-      ],
+      "evidence": ["CONTRIBUTING.md", "registry/projects.json"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -354,11 +332,7 @@
     {
       "requirement": "OSPS-GV-03.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0302",
-      "evidence": [
-        "CONTRIBUTING.md",
-        "governance/ACCESS.md",
-        "registry/projects.json"
-      ],
+      "evidence": ["CONTRIBUTING.md", "registry/projects.json"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -366,11 +340,7 @@
     {
       "requirement": "OSPS-GV-04.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-gv-0401",
-      "evidence": [
-        "CONTRIBUTING.md",
-        "governance/ACCESS.md",
-        "registry/projects.json"
-      ],
+      "evidence": ["CONTRIBUTING.md", "registry/projects.json"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -420,8 +390,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0101",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -432,8 +402,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0102",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -444,8 +414,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0201",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -456,8 +426,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0202",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -468,8 +438,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0301",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -480,8 +450,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0401",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -492,8 +462,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0402",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -504,8 +474,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0501",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -516,8 +486,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0502",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -528,8 +498,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0601",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -540,8 +510,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0602",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -552,8 +522,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0603",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -564,8 +534,8 @@
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-qa-0701",
       "evidence": [
         "package-lock.json",
-        "tests/domain.test.ts",
-        "tests/postgres.test.ts"
+        "tests/unit/modules/domain.test.ts",
+        "tests/integration/postgres.test.ts"
       ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
@@ -574,7 +544,7 @@
     {
       "requirement": "OSPS-SA-01.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0101",
-      "evidence": ["docs/trust-model.md", "docs/rollout.md"],
+      "evidence": ["SECURITY.md", "README.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -582,7 +552,7 @@
     {
       "requirement": "OSPS-SA-02.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0201",
-      "evidence": ["docs/trust-model.md", "docs/rollout.md"],
+      "evidence": ["SECURITY.md", "README.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -590,7 +560,7 @@
     {
       "requirement": "OSPS-SA-03.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0301",
-      "evidence": ["docs/trust-model.md", "docs/rollout.md"],
+      "evidence": ["SECURITY.md", "README.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -598,7 +568,7 @@
     {
       "requirement": "OSPS-SA-03.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-sa-0302",
-      "evidence": ["docs/trust-model.md", "docs/rollout.md"],
+      "evidence": ["SECURITY.md", "README.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -606,7 +576,11 @@
     {
       "requirement": "OSPS-VM-01.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0101",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -614,7 +588,11 @@
     {
       "requirement": "OSPS-VM-02.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0201",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -622,7 +600,11 @@
     {
       "requirement": "OSPS-VM-03.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0301",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -630,7 +612,11 @@
     {
       "requirement": "OSPS-VM-04.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0401",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -638,7 +624,11 @@
     {
       "requirement": "OSPS-VM-04.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0402",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -646,7 +636,11 @@
     {
       "requirement": "OSPS-VM-05.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0501",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -654,7 +648,11 @@
     {
       "requirement": "OSPS-VM-05.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0502",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -662,7 +660,11 @@
     {
       "requirement": "OSPS-VM-05.03",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0503",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -670,7 +672,11 @@
     {
       "requirement": "OSPS-VM-06.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0601",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -678,7 +684,11 @@
     {
       "requirement": "OSPS-VM-06.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-vm-0602",
-      "evidence": ["SECURITY.md", "src/planner.ts", "docs/rollout.md"],
+      "evidence": [
+        "SECURITY.md",
+        "src/modules/catalog/planner.ts",
+        "README.md"
+      ],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
