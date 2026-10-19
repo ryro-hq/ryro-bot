@@ -83,6 +83,9 @@ or delete them. Each publication rechecks that the tag points to the full target
 SHA, that this commit belongs to `main`, that all three version files agree and
 that `CI` completed successfully for a `push` of that exact SHA on `main`.
 
+GitHub CLI handles draft inspection, asset downloads/uploads and publication
+directly in the workflow; there is no custom release program.
+
 The workflow builds Linux `amd64` with an SPDX SBOM and SLSA provenance, pushing
 a candidate to `ghcr.io/ryro-hq/ryro-bot`. Only `GITHUB_TOKEN` writes images.
 `candidate.json`, attached to the draft before testing, fixes the image digest,
@@ -102,7 +105,8 @@ remains a draft. No version/image badge advertises a release before this check.
 To recover a failed run, select **Release → Run workflow**, branch `main`, and
 supply the existing draft tag, for example `v0.1.0`. The workflow reuses the
 digest from `candidate.json` and reuses completed qualification when all evidence
-and checksums verify. Incomplete qualification resumes with the same digest.
+and `sha256sum --check` verifies the attached evidence. Incomplete qualification
+resumes with the same digest and may replace partial evidence in the draft.
 It accepts a preexisting version tag only if its
 digest matches. Missing evidence, failed migrations, private packages and
 conflicting tags stop publication. Published versions cannot be resumed or
@@ -111,15 +115,13 @@ overwritten; corrections require another release PR. If a failure precedes
 
 Before publishing the draft, the App attaches `sbom.spdx.json`, `provenance.json`,
 `release.json` (source SHA, digests, build/CI/qualification runs) and
-`checksums.json` (SHA-256 for these files and `candidate.json`). Failed smoke logs
-are retained in the workflow's evidence artifact. Releases and GHCR are the
-distribution channels; deployment and applying production migrations are manual.
+`SHA256SUMS` (standard SHA-256 checksums for these files and `candidate.json`).
+Failed smoke logs are retained in the workflow's evidence artifact. Releases
+and GHCR are the distribution channels; deployment and applying production
+migrations are manual.
 
-Run `npm run verify` before changing release automation. Release policy tests
-cover CI/SHA rejection, immutable candidates, missing attestations and retry
-conflicts. The workflow uses an Actions PostgreSQL service and runs the image
-checks directly in named steps, so each failure appears in the Actions log.
-
-Keep every external Action pinned by SHA and validate workflow changes with
-`actionlint`. Activation, the human merge of the first release PR and the public
+Run `npm run verify` before changing release automation and validate workflow
+changes with `actionlint`. Keep every external Action pinned by SHA. Image
+checks run in named Actions steps using a temporary PostgreSQL service.
+Activation, the human merge of the first release PR and the public
 GHCR check require the configured GitHub services; local checks do not publish.

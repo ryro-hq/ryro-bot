@@ -16,6 +16,13 @@ permissions:
   contents: read
   actions: read
 
+env:
+  GH_REPO: ryro-hq/ryro-bot
+
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: release-main
   cancel-in-progress: false
@@ -80,14 +87,22 @@ jobs:
           git -C release-proposal add package.json package-lock.json .release-please-manifest.json
           git -C release-proposal -c core.hooksPath=/dev/null commit --amend --reset-author --signoff --message "$subject"
           git -C release-proposal -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin "HEAD:$RELEASE_BRANCH" "--force-with-lease=refs/heads/$RELEASE_BRANCH:$original"
-      - name: Select a draft with successful CI for its exact SHA
+      - name: Select the release draft
         id: select
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           GITHUB_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag || steps.release.outputs.tag_name }}
           CI_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: node .github/scripts/release.ts select
+        run: |
+          tag="$RELEASE_TAG"
+          if [[ -z "$tag" ]]; then
+            tag=$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" | jq -sr --arg sha "$CI_SHA" '[.[][] | select(.draft and .target_commitish == $sha)] | .[0].tag_name // empty')
+          fi
+          if [[ -n "$tag" ]]; then
+            [[ "$tag" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          fi
 
   publish:
     needs: prepare
@@ -110,9 +125,7 @@ jobs:
       RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with: { ref: main, persist-credentials: false }
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with: { node-version: '24' }
+        with: { ref: main, persist-credentials: false, fetch-depth: 0 }
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
         id: app
         with:
@@ -120,12 +133,46 @@ jobs:
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
           repositories: ryro-bot
           permission-contents: write
-      - name: Recheck source and recover the persisted digest
+      - name: Verify source and recover the candidate
         id: source
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: node .github/scripts/release.ts select
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          version="${RELEASE_TAG#v}"
+          mkdir -p evidence
+          gh release view "$RELEASE_TAG" --json tagName,targetCommitish,isDraft,assets,body > evidence/draft.json
+          jq -e --arg tag "$RELEASE_TAG" '.isDraft and .tagName == $tag' evidence/draft.json
+          sha=$(jq -r .targetCommitish evidence/draft.json)
+          [[ "$sha" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse "refs/tags/$RELEASE_TAG")" = "$sha"
+          git merge-base --is-ancestor "$sha" origin/main
+          git show "$sha:package.json" | jq -e --arg v "$version" '.version == $v'
+          git show "$sha:package-lock.json" | jq -e --arg v "$version" '.version == $v and .packages[""].version == $v'
+          git show "$sha:.release-please-manifest.json" | jq -e --arg v "$version" '.["."] == $v'
+          ci_run=$(GH_TOKEN="$GITHUB_TOKEN" gh run list --workflow ci.yml --branch main --event push --commit "$sha" --limit 100 \
+            --json databaseId,status,conclusion,headSha,headBranch,event | \
+            jq -r --arg sha "$sha" '[.[] | select(.headSha == $sha and .headBranch == "main" and .event == "push" and .status == "completed" and .conclusion == "success")] | .[0].databaseId // empty')
+          [[ "$ci_run" =~ ^[1-9][0-9]*$ ]] || { echo 'No successful main push CI for the release SHA' >&2; exit 1; }
+          digest=''
+          qualified=false
+          if jq -e '.assets | any(.name == "candidate.json")' evidence/draft.json >/dev/null; then
+            gh release download "$RELEASE_TAG" --pattern candidate.json --dir evidence
+            jq -e --arg v "$version" --arg sha "$sha" '.version == $v and .sha == $sha and .image == "ghcr.io/ryro-hq/ryro-bot" and (.digest | test("^sha256:[a-f0-9]{64}$"))' evidence/candidate.json
+            digest=$(jq -r .digest evidence/candidate.json)
+          fi
+          if jq -e '.assets | any(.name == "SHA256SUMS")' evidence/draft.json >/dev/null; then
+            gh release download "$RELEASE_TAG" --dir evidence --pattern release.json --pattern sbom.spdx.json --pattern provenance.json --pattern SHA256SUMS
+            test "$(awk '{print $2}' evidence/SHA256SUMS | sort)" = "$(printf '%s\n' candidate.json release.json sbom.spdx.json provenance.json | sort)"
+            (cd evidence && sha256sum --check --strict SHA256SUMS)
+            jq -e --arg sha "$sha" --arg digest "$digest" --arg v "$version" '.sha == $sha and .version == $v and .digest == $digest and .platform == "linux/amd64" and .checks == {cli:true,migrations:true,health:true}' evidence/release.json
+            jq -e '.spdxVersion | startswith("SPDX-")' evidence/sbom.spdx.json
+            jq -e --slurpfile meta evidence/release.json '.predicate and (.predicateType | startswith("https://slsa.dev/provenance/")) and any(.subject[]; .digest.sha256 == $meta[0].platformDigest[7:])' evidence/provenance.json
+            qualified=true
+          fi
+          printf 'version=%s\nsha=%s\nci_run=https://github.com/%s/actions/runs/%s\ndigest=%s\nqualified=%s\n' \
+            "$version" "$sha" "$GH_REPO" "$ci_run" "$digest" "$qualified" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ steps.source.outputs.sha }}
@@ -159,7 +206,17 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           GITHUB_TOKEN: ${{ github.token }}
           CANDIDATE_DIGEST: ${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-        run: node .github/scripts/release.ts record
+          RELEASE_VERSION: ${{ steps.source.outputs.version }}
+          RELEASE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          [[ "$CANDIDATE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          if [[ ! -f evidence/candidate.json ]]; then
+            jq -n --arg version "$RELEASE_VERSION" --arg sha "$RELEASE_SHA" --arg digest "$CANDIDATE_DIGEST" \
+              --arg run "$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID" \
+              '{version:$version,sha:$sha,digest:$digest,image:"ghcr.io/ryro-hq/ryro-bot",buildRun:$run}' > evidence/candidate.json
+            gh release upload "$RELEASE_TAG" evidence/candidate.json
+          fi
+          test "$(jq -r .digest evidence/candidate.json)" = "$CANDIDATE_DIGEST"
       - name: Pull the exact candidate and check its compiled CLIs
         if: steps.source.outputs.qualified != 'true'
         env:
@@ -230,13 +287,25 @@ jobs:
           done
           jq -e .predicate evidence/sbom.statement.json > evidence/sbom.spdx.json
           cp evidence/provenance.statement.json evidence/provenance.json
-      - name: Attach and verify immutable release evidence
+      - name: Attach qualification evidence with GitHub CLI
         if: steps.source.outputs.qualified != 'true'
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           GITHUB_TOKEN: ${{ github.token }}
           PLATFORM_DIGEST: ${{ steps.attestations.outputs.platform_digest }}
-        run: node .github/scripts/release.ts evidence
+          CI_RUN: ${{ steps.source.outputs.ci_run }}
+        run: |
+          jq -e '. == {cli:true,migrations:true,health:true}' evidence/smoke.json
+          jq -e '.spdxVersion | startswith("SPDX-")' evidence/sbom.spdx.json
+          jq -e '.predicateType | startswith("https://slsa.dev/provenance/")' evidence/provenance.json
+          jq -n --slurpfile candidate evidence/candidate.json --slurpfile checks evidence/smoke.json \
+            --arg platformDigest "$PLATFORM_DIGEST" --arg ciRun "$CI_RUN" \
+            --arg run "$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID" \
+            '$candidate[0] + {platform:"linux/amd64",platformDigest:$platformDigest,ciRun:$ciRun,qualificationRun:$run,checks:$checks[0]}' > evidence/release.json
+          (cd evidence && sha256sum candidate.json release.json sbom.spdx.json provenance.json > SHA256SUMS)
+          gh release upload "$RELEASE_TAG" evidence/release.json evidence/sbom.spdx.json evidence/provenance.json --clobber
+          # Upload the completion marker only after every evidence file is attached.
+          gh release upload "$RELEASE_TAG" evidence/SHA256SUMS
       - name: Promote the same digest without replacing a version tag
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -290,7 +359,17 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           GITHUB_TOKEN: ${{ github.token }}
           PUBLIC_DIGEST: ${{ steps.public.outputs.digest }}
-        run: node .github/scripts/release.ts publish
+          RELEASE_SHA: ${{ steps.source.outputs.sha }}
+          RELEASE_VERSION: ${{ steps.source.outputs.version }}
+        run: |
+          test "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" = true
+          test "$(gh api "repos/$GH_REPO/git/ref/tags/$RELEASE_TAG" --jq .object.sha)" = "$RELEASE_SHA"
+          test "$(jq -r .digest evidence/candidate.json)" = "$PUBLIC_DIGEST"
+          (cd evidence && sha256sum --check --strict SHA256SUMS)
+          jq -r .body evidence/draft.json > evidence/notes.md
+          printf '\nImage: `ghcr.io/ryro-hq/ryro-bot:%s`\nDigest: `%s`\nCommit: %s\n' \
+            "$RELEASE_VERSION" "$PUBLIC_DIGEST" "$RELEASE_SHA" >> evidence/notes.md
+          gh release edit "$RELEASE_TAG" --draft=false --verify-tag --notes-file evidence/notes.md
       - name: Collect image and PostgreSQL logs
         if: always()
         env:
