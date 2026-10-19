@@ -1,0 +1,6 @@
+# Configuration for https://github.com/dcoapp/app.
+require:
+  members: true
+allowRemediationCommits:
+  individual: false
+  thirdParty: false
