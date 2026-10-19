@@ -13,7 +13,8 @@ for automatic fixes. Commitlint checks subjects locally and in CI: `type(scope):
 for example `fix(queue): renew worker leases` or `chore(deps): update dependencies`.
 Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
 `ci`, `revert`. Scope is required and lowercase; breaking changes may use
-`feat(api)!: description`. The `commit-msg` hook and PR CI check every new commit.
+`feat(api)!: description`. The `commit-msg` hook checks new commits locally;
+CI's `quality` job checks every commit introduced by a PR.
 
 Each contributor certifies the [Developer Certificate of Origin 1.1](https://developercertificate.org/)
 by adding their own `Signed-off-by: Name <email>` trailer (`git commit -s`).

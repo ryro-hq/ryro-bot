@@ -21,10 +21,16 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with: { persist-credentials: false }
+        with: { persist-credentials: false, fetch-depth: 0 }
       - uses: ./.github/actions/node
       - name: Formatting, lint and type checking
         run: npm run quality
+      - name: Conventional commits
+        if: github.event_name == 'pull_request'
+        env:
+          COMMIT_BASE: ${{ github.event.pull_request.base.sha }}
+          COMMIT_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: npm run commit:check -- --from "$COMMIT_BASE" --to "$COMMIT_HEAD" --strict
       - name: Dependency policy
         run: npm audit --omit=dev
 
@@ -69,35 +75,14 @@ jobs:
           docker run --rm --read-only --cap-drop ALL ryro-bot:ci node dist/admin.js --help
           docker run --rm --read-only --cap-drop ALL ryro-bot:ci node dist/migrate.js --help
 
-  commits:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with: { persist-credentials: false, fetch-depth: 0 }
-      - uses: ./.github/actions/node
-      - name: Conventional commits
-        env:
-          COMMIT_BASE: ${{ github.event.pull_request.base.sha }}
-          COMMIT_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: npm run commit:check -- --from "$COMMIT_BASE" --to "$COMMIT_HEAD" --strict
-
   verify:
     if: always()
-    needs: [quality, unit-tests, integration-tests, build, commits]
+    needs: [quality, unit-tests, integration-tests, build]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Require every mandatory job to succeed
         env:
           RESULTS: ${{ toJSON(needs) }}
-          EVENT_NAME: ${{ github.event_name }}
         run: |
-          jq --exit-status --arg event "$EVENT_NAME" '
-            all(to_entries[];
-              .value.result == "success" or
-              ($event != "pull_request" and
-                .key == "commits" and
-                .value.result == "skipped"))
-          ' <<< "$RESULTS"
+          jq --exit-status 'all(.[]; .result == "success")' <<< "$RESULTS"
