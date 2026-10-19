@@ -14,12 +14,15 @@
     "test:integration": "vitest run tests/integration tests/e2e",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "verify": "npm run format:check && npm run check && npm test && npm run build",
+    "verify": "npm run quality && npm test && npm run build",
     "migrate": "node --env-file-if-exists=.env src/migrate.ts",
     "hooks:install": "simple-git-hooks",
     "commit:check": "commitlint",
     "prepare": "simple-git-hooks",
-    "test:unit": "vitest run tests/unit"
+    "test:unit": "vitest run tests/unit",
+    "lint": "oxlint --deny-warnings .",
+    "lint:fix": "oxlint --fix .",
+    "quality": "npm run format:check && npm run lint && npm run check"
   },
   "dependencies": {
     "@effect/platform-node": "4.0.0",
@@ -33,6 +36,8 @@
     "@commitlint/config-conventional": "21.2.4",
     "@types/node": "24.19.1",
     "oxfmt": "0.71.0",
+    "oxlint": "1.88.0",
+    "oxlint-tsgolint": "7.0.2004",
     "simple-git-hooks": "2.14.0",
     "typescript": "7.0.2",
     "vitest": "5.0.3"
@@ -45,7 +50,8 @@
   },
   "simple-git-hooks": {
     "commit-msg": "npm run --silent commit:check -- --edit \"$1\"",
-    "preserveUnused": true
+    "preserveUnused": true,
+    "pre-commit": "npm run quality"
   },
   "commitlint": {
     "extends": [

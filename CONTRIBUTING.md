@@ -2,12 +2,14 @@
 
 Discuss larger behavior changes in an issue; send small fixes as pull requests.
 Include the triggering case, expected behavior and focused verification. Run
-`npm run verify` and the PostgreSQL suite for persistence or reconciliation changes.
+`npm run verify` (formatting, lint, types, tests and build) and the PostgreSQL suite for persistence or reconciliation changes.
 Use local product checks for recipe work. Security reports follow `SECURITY.md`.
 
 Hooks are managed by `simple-git-hooks` in `package.json` and installed by
 `npm install`. After `npm ci --ignore-scripts`, run `npm run hooks:install`.
-Commitlint checks subjects locally and in CI: `type(scope): description`,
+The pre-commit hook runs `npm run quality`; CI requires the same formatting,
+type-aware Oxlint and TypeScript checks. Use `npm run format` and `npm run lint:fix`
+for automatic fixes. Commitlint checks subjects locally and in CI: `type(scope): description`,
 for example `fix(queue): renew worker leases` or `chore(deps): update dependencies`.
 Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
 `ci`, `revert`. Scope is required and lowercase; breaking changes may use
