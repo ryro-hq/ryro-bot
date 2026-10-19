@@ -78,7 +78,7 @@ describe('module kernel', () => {
           ]),
         ).pipe(Effect.provideService(JobStore, s.value)),
       );
-      expect(s.finishes[0][3]).toBe(true);
+      expect(s.finishes[0]?.[3]).toBe(true);
     }
     expect(called).toBe(false);
   });
@@ -117,7 +117,7 @@ describe('module kernel', () => {
         registerModules([module(() => Effect.fail(new DeferredError(until)))]),
       ).pipe(Effect.provideService(JobStore, s.value)),
     );
-    expect(s.finishes[0].slice(1)).toEqual([
+    expect(s.finishes[0]?.slice(1)).toEqual([
       'github-rate-limited',
       until,
       false,

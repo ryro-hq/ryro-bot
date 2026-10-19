@@ -1,7 +1,7 @@
 import { PgMigrator } from '@effect/sql-pg';
 import { Effect } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { BotError } from '../../kernel/errors.ts';
+import { BotError, requireThat } from '../../kernel/errors.ts';
 import initial from './migrations/001_central_bot.ts';
 import runtime from './migrations/002_runtime.ts';
 
@@ -19,6 +19,7 @@ export const migrationStatus = Effect.gen(function* () {
   const [table] = yield* sql<{
     present: string | null;
   }>`SELECT to_regclass('ryro_bot_migrations')::text AS present`;
+  requireThat(table, 'migration-table-status-missing');
   const applied = table.present
     ? yield* sql<{
         id: number;

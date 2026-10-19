@@ -40,15 +40,16 @@ export const receive = (
         }>`INSERT INTO deliveries (delivery_id,repository,event,digest,payload)
       VALUES (${delivery},${repository},${event},${digest},${pg.json(payload)}) ON CONFLICT DO NOTHING RETURNING delivery_id`;
         if (!inserted.length) {
-          const rows = yield* sql<{
+          const [row] = yield* sql<{
             digest: string;
             event: string;
             repository: string;
           }>`SELECT digest,event,repository FROM deliveries WHERE delivery_id=${delivery}`;
           if (
-            rows[0].digest !== digest ||
-            rows[0].event !== event ||
-            rows[0].repository !== repository
+            !row ||
+            row.digest !== digest ||
+            row.event !== event ||
+            row.repository !== repository
           )
             return yield* new BotError({ code: 'delivery-id-collision' });
           return false;
@@ -69,23 +70,23 @@ export const claim = Effect.gen(function* () {
   return yield* sql.withTransaction(
     Effect.gen(function* () {
       // A repository row serializes remote operations across workers and scheduler jobs.
-      const repos = yield* sql<{
+      const [repo] = yield* sql<{
         repository: string;
       }>`SELECT repository FROM repositories r
       WHERE (lease_until IS NULL OR lease_until < clock_timestamp()) AND EXISTS (
         SELECT 1 FROM jobs j WHERE j.repository=r.repository AND j.attempts<j.max_attempts AND j.available_at<=clock_timestamp()
         AND (j.state='pending' OR (j.state='running' AND j.lease_until<clock_timestamp())))
       ORDER BY last_claimed_at NULLS FIRST,repository FOR UPDATE SKIP LOCKED LIMIT 1`;
-      if (!repos.length) return null;
+      if (!repo) return null;
       const token = randomUUID();
-      const jobs =
+      const [job] =
         yield* sql<Job>`UPDATE jobs SET state='running', attempts=attempts+1,lease_token=${token},lease_until=clock_timestamp()+interval '5 minutes'
-      WHERE id=(SELECT id FROM jobs WHERE repository=${repos[0].repository} AND attempts<max_attempts AND available_at<=clock_timestamp()
+      WHERE id=(SELECT id FROM jobs WHERE repository=${repo.repository} AND attempts<max_attempts AND available_at<=clock_timestamp()
       AND (state='pending' OR (state='running' AND lease_until<clock_timestamp())) ORDER BY floor(extract(epoch FROM (clock_timestamp()-created_at))/300) DESC,priority,available_at,created_at LIMIT 1 FOR UPDATE SKIP LOCKED)
       RETURNING id,repository,kind,payload,lease_token,attempts,generation,payload_version`;
-      if (!jobs.length) return null;
-      yield* sql`UPDATE repositories SET last_claimed_at=clock_timestamp(),lease_token=${token},lease_until=clock_timestamp()+interval '5 minutes' WHERE repository=${repos[0].repository}`;
-      return jobs[0];
+      if (!job) return null;
+      yield* sql`UPDATE repositories SET last_claimed_at=clock_timestamp(),lease_token=${token},lease_until=clock_timestamp()+interval '5 minutes' WHERE repository=${repo.repository}`;
+      return job;
     }),
   );
 });

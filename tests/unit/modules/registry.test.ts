@@ -16,7 +16,7 @@ it('enables CI without requiring a package catalog', async () => {
       },
     ],
   });
-  expect(projects[0].packages).toEqual({});
+  expect(projects[0]?.packages).toEqual({});
   const registry = builtinModules({
     mode: 'observe',
     revision,

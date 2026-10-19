@@ -41,6 +41,7 @@ export const checkDurability = Effect.gen(function* () {
   }>`SELECT current_setting('fsync') AS fsync,
     current_setting('full_page_writes') AS full_page_writes,current_setting('synchronous_commit') AS synchronous_commit`;
   if (
+    !settings ||
     settings.fsync !== 'on' ||
     settings.full_page_writes !== 'on' ||
     settings.synchronous_commit !== 'on'

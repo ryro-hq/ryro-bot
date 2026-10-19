@@ -18,7 +18,7 @@ export const discoveryStoreLayer = Layer.effect(
             complete: boolean;
           }>`SELECT policy_digest,complete FROM channels WHERE repository=${repository} AND package=${pkg}`;
           requireThat(
-            old.policy_digest === digest,
+            old && old.policy_digest === digest,
             'discovery-authority-changed-review-required',
           );
           if (old.complete)
@@ -30,7 +30,10 @@ export const discoveryStoreLayer = Layer.effect(
             cursor: string;
             generation: string;
           }>`SELECT cursor,generation FROM channels WHERE repository=${repository} AND package=${pkg}`,
-          (rows) => rows[0],
+          ([row]) => {
+            requireThat(row, 'discovery-channel-not-found');
+            return row;
+          },
         ),
       commit: (repository, pkg, state, body, versions, next) =>
         sql.withTransaction(
@@ -40,6 +43,7 @@ export const discoveryStoreLayer = Layer.effect(
               generation: string;
             }>`SELECT cursor,generation FROM channels WHERE repository=${repository} AND package=${pkg} FOR UPDATE`;
             if (
+              !locked ||
               locked.cursor !== state.cursor ||
               locked.generation !== state.generation
             )

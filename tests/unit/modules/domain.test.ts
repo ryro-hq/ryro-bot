@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { Redacted } from 'effect';
@@ -59,7 +60,11 @@ const admitted = [
 ];
 const makePlan = (candidates = [candidate('2.0.0')], p = project) =>
   plan(p, base, revision, candidates, admitted, { catalog: 100, lock: 100 });
-const batch = () => makePlan().batches[0];
+const batch = () => {
+  const [result] = makePlan().batches;
+  assert.ok(result, 'Expected an update batch');
+  return result;
+};
 
 describe('base policy and review routing', () => {
   it('routes package, shared changes and unknown files', () => {
@@ -84,6 +89,7 @@ describe('base policy and review routing', () => {
   });
   it('unions deputies from overlapping categories', () => {
     const p = structuredClone(project);
+    assert.ok(p.categories.security);
     p.categories.security.deputies = ['@reviewer'];
     expect(route(p, ['.ryro-bot.toml'], 'fullzer4').reviewers).toEqual([
       '@reviewer',
@@ -95,6 +101,14 @@ describe('base policy and review routing', () => {
   it('refuses path traversal and missing file lists', () => {
     for (const paths of [[], ['../secret'], ['/etc/passwd'], ['a\\b']])
       expect(() => route(project, paths, 'a')).toThrow();
+  });
+  it('refuses routing when a package references missing ownership', () => {
+    const p = structuredClone(project);
+    assert.ok(p.packages.nginx);
+    p.packages.nginx.category = 'missing';
+    expect(() =>
+      route(p, ['recipes/packages/nginx/package.srx'], 'someone'),
+    ).toThrow('unknown-category');
   });
   it('pins policy from the base and refuses altered opt-in and fields', () => {
     const config = `schema = 1\nenabled = true\npolicy = "syrox-pkgs-v1"\npolicy_revision = "${revision}"\n`;
@@ -123,11 +137,11 @@ describe('bounded planning and recovery', () => {
     ).toBe(true);
     expect(result.estimatedCombinations).toBeLessThanOrEqual(4096);
     expect(result.queued.length).toBeGreaterThan(0);
-    expect(result.batches[0].versions).toContain('2.4999.0');
+    expect(result.batches[0]?.versions).toContain('2.4999.0');
   });
   it('prioritizes security and keeps prereleases discoverable', () => {
     const result = makePlan([candidate('9.0.0'), candidate('2.0.0-rc1', true)]);
-    expect(result.batches[0].versions).toContain('2.0.0-rc1');
+    expect(result.batches[0]?.versions).toContain('2.0.0-rc1');
     expect(result.publicationReady).toBe(false);
   });
   it('excludes held and admitted versions, deduplicates and bounds bytes', () => {
@@ -138,7 +152,7 @@ describe('bounded planning and recovery', () => {
       ]).batches,
     ).toHaveLength(0);
     expect(
-      makePlan([candidate('2.0.0'), candidate('2.0.0')]).batches[0].versions,
+      makePlan([candidate('2.0.0'), candidate('2.0.0')]).batches[0]?.versions,
     ).toHaveLength(1);
     const p = structuredClone(project);
     p.limits.lockBytes = 101;
@@ -160,7 +174,7 @@ describe('bounded planning and recovery', () => {
       author: 'ryro[bot]',
       humanCommits: false,
     };
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe('recover-draft-pr');
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe('recover-draft-pr');
     s.prs.push({
       batchId: b.id,
       number: 1,
@@ -169,7 +183,7 @@ describe('bounded planning and recovery', () => {
       headSha: revision,
       draft: true,
     });
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe('respect-closed');
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe('respect-closed');
   });
   it('preserves human commits and replans a changed base', () => {
     const b = batch(),
@@ -181,11 +195,11 @@ describe('bounded planning and recovery', () => {
       author: 'ryro[bot]',
       humanCommits: true,
     };
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe(
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe(
       'preserve-human-work',
     );
     s.baseSha = revision;
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe('replan');
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe('replan');
   });
   it('caps open PRs, fails on incomplete remote state and checks the head SHA', () => {
     const b = batch(),
@@ -198,7 +212,7 @@ describe('bounded planning and recovery', () => {
       headSha: revision,
       draft: true,
     }));
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe('queued');
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe('queued');
     expect(() =>
       reconcile([b], { ...s, complete: false }, 'ryro[bot]'),
     ).toThrow();
@@ -221,10 +235,12 @@ describe('bounded planning and recovery', () => {
       author: 'ryro[bot]',
       humanCommits: false,
     };
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe('request-checks');
-    s.prs[0].checksSha = revision;
-    s.prs[0].checks = 'failure';
-    expect(reconcile([b], s, 'ryro[bot]')[0].action).toBe('wait');
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe('request-checks');
+    const [pr] = s.prs;
+    assert.ok(pr);
+    pr.checksSha = revision;
+    pr.checks = 'failure';
+    expect(reconcile([b], s, 'ryro[bot]')[0]?.action).toBe('wait');
   });
 });
 
@@ -270,7 +286,8 @@ describe('webhook and discovery boundaries', () => {
     ).toThrow();
   });
   it('parses historical, prerelease and development versions with pagination', () => {
-    const c = project.packages.nginx.discovery!;
+    const c = project.packages.nginx?.discovery;
+    assert.ok(c);
     const parsed = parsePage(
       Buffer.from(
         '<html><a href="nginx-1.2.0.tar.gz">old</a><a href="nginx-1.3.0.tar.gz">dev</a><a href="nginx-2.0.0-rc1.tar.gz">pre</a><a rel="next" href="?page=2">next</a>',
@@ -291,7 +308,8 @@ describe('webhook and discovery boundaries', () => {
     ).toThrow();
   });
   it('decodes HTML entities once before validating pagination URLs', () => {
-    const c = project.packages.nginx.discovery!;
+    const c = project.packages.nginx?.discovery;
+    assert.ok(c);
     const next = (href: string) =>
       parsePage(
         Buffer.from(`<a rel="next" href="${href}">next</a>`),
@@ -308,8 +326,10 @@ describe('webhook and discovery boundaries', () => {
     );
   });
   it('retains API prereleases, excludes drafts and rejects cross-origin pagination', () => {
+    const discovery = project.packages.nginx?.discovery;
+    assert.ok(discovery);
     const c = {
-      ...project.packages.nginx.discovery!,
+      ...discovery,
       format: 'github' as const,
       url: 'https://api.github.com/repos/a/b/releases',
       origin: 'https://api.github.com/',
@@ -390,6 +410,7 @@ describe('evidence admission', () => {
       admitPrepared(doc, b, { ...run, referenced_workflows: [] }, 1, project),
     ).toThrow();
     const changed = structuredClone(doc);
+    assert.ok(changed.files[0]);
     changed.files[0].content = 'eQ==';
     expect(() => admitPrepared(changed, b, run, 1, project)).toThrow();
   });

@@ -40,12 +40,11 @@ export function prepare(
       new Set(versions).size === versions.length,
     'invalid-preparation-versions',
   );
-  versions.forEach(component);
   const intent = {
     repository: env.GITHUB_REPOSITORY ?? '',
     package: component(env.PACKAGE ?? ''),
     profile: component(env.PROFILE ?? ''),
-    versions: [...versions].sort() as string[],
+    versions: versions.map(component).sort(),
   };
   const projects = decodeProjects(
     JSON.parse(
@@ -130,7 +129,7 @@ export function prepare(
     ['generate', '--check'],
     ['check'],
     ['lock', '--check'],
-  ]) {
+  ] as const) {
     execFileSync(engine, ['catalog', command, cwd, ...args], {
       cwd,
       stdio: 'inherit',
@@ -191,6 +190,7 @@ export function prepare(
     );
     const entries = git('ls-tree', batch.baseSha, '--', path);
     const beforeBlob = entries ? entries.split(/\s+/)[2] : null;
+    requireThat(beforeBlob !== undefined, 'invalid-base-tree-entry');
     return {
       path,
       beforeBlob,

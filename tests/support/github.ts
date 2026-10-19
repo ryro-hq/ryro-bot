@@ -1,4 +1,5 @@
 import { zipSync } from 'fflate';
+import assert from 'node:assert/strict';
 import type { GitHubAPI, Pull, Run } from '../../src/modules/ci/model.ts';
 import type { Batch } from '../../src/modules/catalog/model.ts';
 import type { Project } from '../../src/modules/contracts/project.ts';
@@ -89,6 +90,7 @@ export class FakeGitHub implements GitHubAPI {
     inputs: Record<string, string>,
   ) {
     this.calls.push('DISPATCH ' + workflow);
+    assert.ok(inputs.expected_sha);
     const run: Run = {
       id: 42,
       run_attempt: 1,

@@ -39,15 +39,16 @@ export function route(project: Project, paths: string[], author: string) {
       }
     if (!matched) project.fallback.forEach((o) => reviewers.add(o));
   }
-  for (const p of packages)
-    [...project.packages[p].owners, ...project.packages[p].deputies].forEach(
-      (o) => reviewers.add(o),
-    );
-  for (const c of categories)
-    [
-      ...project.categories[c].owners,
-      ...project.categories[c].deputies,
-    ].forEach((o) => reviewers.add(o));
+  for (const p of packages) {
+    const pkg = project.packages[p];
+    requireThat(pkg, 'unknown-package');
+    [...pkg.owners, ...pkg.deputies].forEach((o) => reviewers.add(o));
+  }
+  for (const c of categories) {
+    const category = project.categories[c];
+    requireThat(category, 'unknown-category');
+    [...category.owners, ...category.deputies].forEach((o) => reviewers.add(o));
+  }
   for (const reviewer of reviewers)
     if (reviewer.toLowerCase() === '@' + author.replace(/^@/, '').toLowerCase())
       reviewers.delete(reviewer);

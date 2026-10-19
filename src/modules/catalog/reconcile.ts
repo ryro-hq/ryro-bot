@@ -333,9 +333,13 @@ export const reconcileProject = (
         const matches = artifacts.filter(
           (a) => a.name === 'prepared-' + batch.id + '-' + runId && !a.expired,
         );
-        requireThat(matches.length === 1, 'missing-preparation-artifact');
+        const [artifact] = matches;
+        requireThat(
+          matches.length === 1 && artifact,
+          'missing-preparation-artifact',
+        );
         const bytes = yield* remote(() =>
-          api.artifact(matches[0].id, matches[0].digest),
+          api.artifact(artifact.id, artifact.digest),
         );
         const document = yield* Effect.try({
           try: () =>
@@ -499,9 +503,9 @@ const publishPrepared = (
         ];
       }
     }
-    requireThat(pulls.length === 1, 'duplicate-prs');
+    const [pr] = pulls;
+    requireThat(pulls.length === 1 && pr, 'duplicate-prs');
     yield* (yield* PullTracker).remember(project.repository, pulls);
-    const pr = pulls[0];
     if (pr.state === 'closed') return;
     requireThat(
       pr.user.login === settings.appLogin &&

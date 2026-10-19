@@ -1,4 +1,5 @@
 import { generateKeyPairSync } from 'node:crypto';
+import assert from 'node:assert/strict';
 import { Redacted } from 'effect';
 import { describe, expect, it } from 'vitest';
 import { GitHub } from '../../../src/adapters/github/client.ts';
@@ -16,8 +17,8 @@ describe('GitHub capability and credential boundaries', () => {
       input: URL | string | Request,
       init?: RequestInit,
     ) => {
-      const url = String(input),
-        body = init?.body ? JSON.parse(init.body as string) : null,
+      const url = input instanceof Request ? input.url : input.toString(),
+        body = typeof init?.body === 'string' ? JSON.parse(init.body) : null,
         headers = new Headers(init?.headers);
       requests.push({ url, body, headers });
       if (url.includes('/access_tokens'))
@@ -35,19 +36,22 @@ describe('GitHub capability and credential boundaries', () => {
       transport,
     );
     await api.dispatch('prepare.yml', 'main', { expected_sha: 'a'.repeat(40) });
-    expect(requests[0].body).toEqual({
+    const [issued, dispatched] = requests;
+    assert.ok(issued && dispatched);
+    expect(issued.body).toEqual({
       repository_ids: [7],
       permissions: { actions: 'write' },
     });
-    const jwt = requests[0].headers.get('authorization')!.split(' ')[1];
-    const payload = JSON.parse(
-      Buffer.from(jwt.split('.')[1], 'base64url').toString(),
-    );
+    const jwt = issued.headers.get('authorization')?.split(' ')[1];
+    assert.ok(jwt);
+    const encoded = jwt.split('.')[1];
+    assert.ok(encoded);
+    const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString());
     expect(payload.exp - payload.iat).toBeLessThanOrEqual(360);
-    expect(requests[1].headers.get('authorization')).toBe(
+    expect(dispatched.headers.get('authorization')).toBe(
       'Bearer installation-only',
     );
-    expect(requests[1].headers.get('X-GitHub-Api-Version')).toBe('2026-03-10');
+    expect(dispatched.headers.get('X-GitHub-Api-Version')).toBe('2026-03-10');
   });
   it('rejects broad token responses and cross-repository requests', async () => {
     const transport = (async () =>
@@ -101,7 +105,7 @@ describe('GitHub capability and credential boundaries', () => {
       input: URL | string | Request,
       init?: RequestInit,
     ) => {
-      const url = String(input);
+      const url = input instanceof Request ? input.url : input.toString();
       requests.push(new Headers(init?.headers));
       if (url.includes('access_tokens'))
         return Response.json({
@@ -126,7 +130,7 @@ describe('GitHub capability and credential boundaries', () => {
       transport,
     );
     expect(await api.artifact(9, 'sha256:' + sha256(bytes))).toEqual(bytes);
-    expect(requests.at(-1)!.has('authorization')).toBe(false);
+    expect(requests.at(-1)?.has('authorization')).toBe(false);
     await expect(api.artifact(9, 'sha256:' + '0'.repeat(64))).rejects.toThrow(
       'artifact-digest-mismatch',
     );
@@ -151,7 +155,7 @@ describe('GitHub capability and credential boundaries', () => {
       },
     ];
     const transport = (async (input: URL | string | Request) => {
-      const url = String(input);
+      const url = input instanceof Request ? input.url : input.toString();
       if (url.includes('access_tokens'))
         return Response.json({
           token: 'installation',
@@ -185,10 +189,12 @@ describe('GitHub runtime coordination', () => {
       input: URL | string | Request,
       init?: RequestInit,
     ) => {
-      const url = String(input);
+      const url = input instanceof Request ? input.url : input.toString();
       urls.push(url);
       if (url.includes('access_tokens')) {
-        tokenPermissions.push(JSON.parse(String(init?.body)).permissions);
+        const body = init?.body;
+        assert.ok(typeof body === 'string');
+        tokenPermissions.push(JSON.parse(body).permissions);
         return Response.json({
           token: 'scoped',
           expires_at: new Date(Date.now() + 3600000).toISOString(),
@@ -233,7 +239,11 @@ describe('GitHub runtime coordination', () => {
       cooldown = 0;
     const transport = (async (input: URL | string | Request) => {
       calls++;
-      if (String(input).includes('access_tokens'))
+      if (
+        (input instanceof Request ? input.url : input.toString()).includes(
+          'access_tokens',
+        )
+      )
         return Response.json({
           token: 'scoped',
           expires_at: new Date(Date.now() + 3600000).toISOString(),
@@ -269,7 +279,9 @@ describe('GitHub runtime coordination', () => {
       max = Math.max(max, active);
       await new Promise((resolve) => setTimeout(resolve, 5));
       active--;
-      return String(input).includes('access_tokens')
+      return (input instanceof Request ? input.url : input.toString()).includes(
+        'access_tokens',
+      )
         ? Response.json({ token: 'scoped', repositories: [{ id: 73 }] })
         : Response.json({ commit: { sha: 'a'.repeat(40) } });
     }) as typeof fetch;
@@ -292,7 +304,11 @@ describe('GitHub runtime coordination', () => {
       input: URL | string | Request,
       init?: RequestInit,
     ) => {
-      if (String(input).includes('access_tokens'))
+      if (
+        (input instanceof Request ? input.url : input.toString()).includes(
+          'access_tokens',
+        )
+      )
         return Response.json({ token: 'scoped', repositories: [{ id: 74 }] });
       if (init?.method === 'POST') {
         writes++;
@@ -328,7 +344,7 @@ describe('GitHub runtime coordination', () => {
   it('reads bounded files larger than the Contents inline encoding limit', async () => {
     const bytes = Buffer.alloc(1100000, 97);
     const transport = (async (input: URL | string | Request) => {
-      const url = String(input);
+      const url = input instanceof Request ? input.url : input.toString();
       if (url.includes('access_tokens'))
         return Response.json({
           token: 'scoped',

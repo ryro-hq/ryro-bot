@@ -72,7 +72,7 @@ describe.skipIf(!url)('real PostgreSQL durability and recovery', () => {
         }>`SELECT count(*)::int AS count FROM jobs WHERE repository=${r}`;
       }),
     );
-    expect(counts[0].count).toBe(1);
+    expect(counts[0]?.count).toBe(1);
     await expect(
       run(receive(id, r, 'push', Buffer.from('{"value":2}'))),
     ).rejects.toThrow();
@@ -155,7 +155,7 @@ describe.skipIf(!url)('real PostgreSQL durability and recovery', () => {
         }>`SELECT state FROM jobs WHERE id=${job!.id}`;
       }),
     );
-    expect(rows[0].state).toBe('dead');
+    expect(rows[0]?.state).toBe('dead');
   });
   const channel: Channel = {
     url: 'https://example.org/releases/',
@@ -230,7 +230,7 @@ describe.skipIf(!url)('real PostgreSQL durability and recovery', () => {
         }>`SELECT complete FROM channels WHERE repository=${r}`;
       }),
     );
-    expect(state[0].complete).toBe(false);
+    expect(state[0]?.complete).toBe(false);
   });
   it('persists evidence outside product repositories with a content address', async () => {
     const r = repo(),
@@ -245,6 +245,6 @@ describe.skipIf(!url)('real PostgreSQL durability and recovery', () => {
         }>`SELECT document FROM evidence WHERE digest=${digest}`;
       }),
     );
-    expect(state[0].document).toEqual(doc);
+    expect(state[0]?.document).toEqual(doc);
   });
 });
