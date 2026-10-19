@@ -41,8 +41,6 @@ DCO sign-offs and individual commit messages are preserved; squash and merge com
 DCO and commit subjects are checked on each PR before queue admission.
 DCO2 reports success on merge groups based on admission; it does not revalidate
 their commits. The required App check and absence of ruleset bypasses are essential.
-CodeQL results are required; high or critical security findings and errors
-block integration.
 
 Changes to registry, workflows, permissions, rollout gates and security policy
 require explicit security review. Rules for a proposed change are loaded from
