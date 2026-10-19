@@ -4,6 +4,56 @@ Discuss larger behavior changes in an issue; send small fixes as pull requests.
 Include the triggering case, expected behavior and focused verification. Run
 checks appropriate to the change. Security reports follow [SECURITY.md](SECURITY.md).
 
+## Local development
+
+For local development, use Node.js 24.12+ (supported majors: 24–26) and PostgreSQL:
+
+```sh
+npm ci --ignore-scripts
+npm run hooks:install
+npm run verify
+```
+
+Copy [.env.example](.env.example) to `.env`. Point `DATABASE_URL_FILE` to a file
+containing the database URL and `GITHUB_WEBHOOK_SECRET_FILE` to a secret file
+with at least 32 characters. Use host file paths for local development; the
+example's `/run/secrets` paths are for containers. Set `RYRO_BOT_VERSION` and
+`RYRO_POLICY_REVISION` to full Git SHAs.
+
+For a local database without TLS, set `RYRO_LOCAL_DATABASE=true` and remove
+`PG_CA_FILE`; accepted hosts are `localhost`, `127.0.0.1`, `[::1]` and `postgres`.
+Production verifies TLS; set `PG_CA_FILE` when a custom CA is needed. `observe`
+needs no GitHub App key; omit `RYRO_BINDINGS_FILE` when unused. Write modes need
+the runtime App identity, private key and installation bindings. The pilot's
+publication gate is disabled; see [registry configuration](registry/projects.json).
+
+```sh
+npm run migrate -- apply
+npm run migrate -- check
+npm run dev
+```
+
+The service listens on port 8790; `GET /healthz` checks database availability.
+Set `HOST=0.0.0.0` when accessing it outside localhost. Set `TEST_DATABASE_URL`
+to include the PostgreSQL integration tests in `npm run verify`.
+
+## Container
+
+Build and run the production image locally. Use `/run/secrets/...` paths in
+the container's environment, matching the mounted files:
+
+```sh
+docker build --build-arg RYRO_BOT_VERSION="$(git rev-parse HEAD)" -t ryro-bot:local .
+docker run --rm --env-file .env --mount type=bind,src="$PWD/secrets",dst=/run/secrets,readonly \
+  ryro-bot:local node dist/migrate.js apply
+docker run --rm --env-file .env --mount type=bind,src="$PWD/secrets",dst=/run/secrets,readonly \
+  -p 127.0.0.1:8790:8790 -e HOST=0.0.0.0 ryro-bot:local
+```
+
+Use a database hostname reachable from the container. Migrations require only
+database configuration; run them before starting the service. Compiled admin
+commands are available with `node dist/admin.js --help`.
+
 ## Development checks
 
 `npm run verify` runs formatting, lint, types, tests and build. Set
@@ -40,6 +90,8 @@ Do not add another person's sign-off. Contributions use the repository license.
 Retain upstream notices and identify copied code, sources, patches and licenses.
 
 ## Review and merge queue
+
+Pull requests require `verify` and `DCO`, resolved conversations and the merge queue.
 
 While `@fullzer4` is the only maintainer, `ryro-bot` temporarily requires zero
 approvals; CODEOWNER and last-push approval requirements are disabled. Resolve
