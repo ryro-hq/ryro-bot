@@ -1,14 +1,14 @@
 import { createSign } from 'node:crypto';
 import { Redacted } from 'effect';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import { DeferredError } from '../../kernel/operations.js';
-import { gitSha } from '../../kernel/values.js';
-import type { Binding } from '../../modules/contracts/project.js';
-import { readBounded } from '../http/client.js';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import { DeferredError } from '../../kernel/operations.ts';
+import { gitSha } from '../../kernel/values.ts';
+import type { Binding } from '../../modules/contracts/project.ts';
+import { readBounded } from '../http/client.ts';
 
 type Permission = 'read' | 'dispatch' | 'contents' | 'pulls';
-export type { Pull, Run } from '../../modules/ci/model.js';
-import type { Pull, Run } from '../../modules/ci/model.js';
+export type { Pull, Run } from '../../modules/ci/model.ts';
+import type { Pull, Run } from '../../modules/ci/model.ts';
 export interface GitHubOptions {
   canonicalRepository?: string;
   signal?: AbortSignal;
@@ -23,14 +23,26 @@ const lastWrite = new Map<number, number>();
 const blocked = new Map<number, number>();
 
 export class GitHub {
+  readonly repository: string;
+  readonly binding: Binding;
+  readonly #appId: string;
+  readonly #privateKey: Redacted.Redacted<string>;
+  readonly #transport: typeof fetch;
+  readonly #options: GitHubOptions;
   constructor(
-    readonly repository: string,
-    readonly binding: Binding,
-    private readonly appId: string,
-    private readonly privateKey: Redacted.Redacted<string>,
-    private readonly transport: typeof fetch = fetch,
-    private readonly options: GitHubOptions = {},
+    repository: string,
+    binding: Binding,
+    appId: string,
+    privateKey: Redacted.Redacted<string>,
+    transport: typeof fetch = fetch,
+    options: GitHubOptions = {},
   ) {
+    this.repository = repository;
+    this.binding = binding;
+    this.#appId = appId;
+    this.#privateKey = privateKey;
+    this.#transport = transport;
+    this.#options = options;
     requireThat(
       /^[\w-]+\/[\w.-]+$/.test(repository) &&
         /^\d+$/.test(appId) &&
@@ -41,7 +53,7 @@ export class GitHub {
   private signal(timeout = 20000) {
     return AbortSignal.any([
       AbortSignal.timeout(timeout),
-      ...(this.options.signal ? [this.options.signal] : []),
+      ...(this.#options.signal ? [this.#options.signal] : []),
     ]);
   }
   private async serialized<A>(
@@ -57,10 +69,10 @@ export class GitHub {
     queues.set(id, current);
     try {
       await previous;
-      this.options.signal?.throwIfAborted();
+      this.#options.signal?.throwIfAborted();
       const until = Math.max(
         blocked.get(id) ?? 0,
-        (await this.options.blockedUntil?.()) ?? 0,
+        (await this.#options.blockedUntil?.()) ?? 0,
       );
       if (until > Date.now()) throw new DeferredError(until);
       if (write) {
@@ -68,7 +80,7 @@ export class GitHub {
         if (delay)
           await new Promise<void>((resolve, reject) => {
             const timer = setTimeout(done, delay);
-            const signal = this.options.signal;
+            const signal = this.#options.signal;
             function done() {
               signal?.removeEventListener('abort', abort);
               resolve();
@@ -80,7 +92,7 @@ export class GitHub {
             signal?.addEventListener('abort', abort, { once: true });
             if (signal?.aborted) abort();
           });
-        this.options.signal?.throwIfAborted();
+        this.#options.signal?.throwIfAborted();
         lastWrite.set(id, Date.now());
       }
       return await work();
@@ -112,7 +124,7 @@ export class GitHub {
     );
     blocked.set(this.binding.installationId, until);
     await response.body?.cancel();
-    await this.options.cooldown?.(until);
+    await this.#options.cooldown?.(until);
     throw new DeferredError(until);
   }
   private async request<T>(
@@ -128,7 +140,7 @@ export class GitHub {
     const write = method !== 'GET';
     const appToken = path.startsWith('/app/installations/');
     const key =
-      this.appId +
+      this.#appId +
       ':' +
       this.binding.installationId +
       ':' +
@@ -136,10 +148,10 @@ export class GitHub {
       ':' +
       path;
     return this.serialized(write && !appToken, async () => {
-      if (write && !appToken) await this.options.beforeWrite?.(path);
-      this.options.signal?.throwIfAborted();
+      if (write && !appToken) await this.#options.beforeWrite?.(path);
+      this.#options.signal?.throwIfAborted();
       const cached = method === 'GET' ? responses.get(key) : undefined;
-      const response = await this.transport('https://api.github.com' + path, {
+      const response = await this.#transport('https://api.github.com' + path, {
         method,
         redirect: 'error',
         signal: this.signal(),
@@ -151,7 +163,7 @@ export class GitHub {
           ...(cached ? { 'If-None-Match': cached.etag } : {}),
           ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
         },
-        body: body === undefined ? undefined : JSON.stringify(body),
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       });
       await this.rate(response);
       if (response.status === 304 && cached)
@@ -175,7 +187,7 @@ export class GitHub {
   }
   private async token(operation: Permission): Promise<string> {
     const cacheKey =
-      this.appId +
+      this.#appId +
       ':' +
       this.binding.installationId +
       ':' +
@@ -190,12 +202,12 @@ export class GitHub {
     const unsigned =
       encode({ alg: 'RS256', typ: 'JWT' }) +
       '.' +
-      encode({ iat: now - 60, exp: now + 300, iss: this.appId });
+      encode({ iat: now - 60, exp: now + 300, iss: this.#appId });
     const signer = createSign('RSA-SHA256').update(unsigned),
       jwt =
         unsigned +
         '.' +
-        signer.sign(Redacted.value(this.privateKey), 'base64url');
+        signer.sign(Redacted.value(this.#privateKey), 'base64url');
     const permissions =
       operation === 'read'
         ? {
@@ -255,7 +267,7 @@ export class GitHub {
     return this.request<T>('GET', target, await this.token('read'));
   }
   private root() {
-    return '/repos/' + (this.options.canonicalRepository ?? this.repository);
+    return '/repos/' + (this.#options.canonicalRepository ?? this.repository);
   }
   async list<T>(suffix: string, field?: string): Promise<T[]> {
     const result: T[] = [];
@@ -504,7 +516,7 @@ export class GitHub {
   async artifact(id: number, expectedDigest: string): Promise<Buffer> {
     const token = await this.token('read');
     const response = await this.serialized(false, async () => {
-      const response = await this.transport(
+      const response = await this.#transport(
         'https://api.github.com' +
           this.root() +
           '/actions/artifacts/' +
@@ -533,13 +545,13 @@ export class GitHub {
           target.hostname.endsWith('.actions.githubusercontent.com')),
       'invalid-artifact-host',
     );
-    const archive = await this.transport(target, {
+    const archive = await this.#transport(target, {
       redirect: 'error',
       signal: this.signal(30000),
     });
     requireThat(archive.ok, 'artifact-download-failed');
     const bytes = await readBounded(archive, 8 * 1024 * 1024);
-    const { sha256 } = await import('../../kernel/values.js');
+    const { sha256 } = await import('../../kernel/values.ts');
     requireThat(
       expectedDigest === 'sha256:' + sha256(bytes),
       'artifact-digest-mismatch',

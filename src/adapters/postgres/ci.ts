@@ -1,8 +1,8 @@
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Layer } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { CIStore } from '../../modules/ci/contracts.js';
-import type { Pull, Run } from '../../modules/ci/model.js';
+import { CIStore } from '../../modules/ci/contracts.ts';
+import type { Pull, Run } from '../../modules/ci/model.ts';
 export const ciStoreLayer = Layer.effect(
   CIStore,
   Effect.gen(function* () {

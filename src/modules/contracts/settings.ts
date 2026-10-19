@@ -1,4 +1,4 @@
-import type { Mode, Project, Binding } from './project.js';
+import type { Mode, Project, Binding } from './project.ts';
 export interface AutomationSettings {
   mode: Mode;
   revision: string;

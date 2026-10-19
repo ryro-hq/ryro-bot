@@ -1,6 +1,6 @@
 import type { Effect, Scope } from 'effect';
-import type { Job } from './jobs.js';
-import type { JobIntent } from './persistence.js';
+import type { Job } from './jobs.ts';
+import type { JobIntent } from './persistence.ts';
 export interface JobDefinition<R> {
   kind: string;
   payloadVersion: number;

@@ -1,8 +1,8 @@
-import { requireThat } from '../../kernel/errors.js';
-import { BotError } from '../../kernel/errors.js';
-import { sameOrigin } from '../../kernel/urls.js';
+import { requireThat } from '../../kernel/errors.ts';
+import { BotError } from '../../kernel/errors.ts';
+import { sameOrigin } from '../../kernel/urls.ts';
 import { Layer } from 'effect';
-import { PageFetcher } from '../../modules/catalog/contracts.js';
+import { PageFetcher } from '../../modules/catalog/contracts.ts';
 export async function readBounded(
   response: Response,
   limit: number,

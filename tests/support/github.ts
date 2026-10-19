@@ -1,10 +1,10 @@
 import { zipSync } from 'fflate';
-import type { GitHubAPI, Pull, Run } from '../../src/modules/ci/model.js';
-import type { Batch } from '../../src/modules/catalog/model.js';
-import type { Project } from '../../src/modules/contracts/project.js';
-import type { Prepared } from '../../src/modules/catalog/evidence.js';
-import { sha256 } from '../../src/kernel/values.js';
-import { base, revision } from './projects.js';
+import type { GitHubAPI, Pull, Run } from '../../src/modules/ci/model.ts';
+import type { Batch } from '../../src/modules/catalog/model.ts';
+import type { Project } from '../../src/modules/contracts/project.ts';
+import type { Prepared } from '../../src/modules/catalog/evidence.ts';
+import { sha256 } from '../../src/kernel/values.ts';
+import { base, revision } from './projects.ts';
 export const catalog =
   'schema=2\n[defaults]\nnginx="1.0.0"\n[[releases]]\nname="nginx"\nversion="1.0.0"\n[[releases.combinations]]\nvariant="minimal"\nsystem="linux-x86_64-gnu"\n';
 export class FakeGitHub implements GitHubAPI {
@@ -14,7 +14,10 @@ export class FakeGitHub implements GitHubAPI {
   runsById = new Map<number, Run>();
   batch?: Batch;
   archive = Buffer.alloc(0);
-  constructor(readonly project: Project) {}
+  readonly project: Project;
+  constructor(project: Project) {
+    this.project = project;
+  }
   async get<T>(path: string): Promise<T> {
     this.calls.push('GET ' + path);
     if (path.includes('state=all')) {

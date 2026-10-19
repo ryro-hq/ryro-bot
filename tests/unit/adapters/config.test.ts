@@ -4,9 +4,9 @@ import { join } from 'node:path';
 import { Effect } from 'effect';
 import { NodeServices } from '@effect/platform-node';
 import { afterEach, expect, it } from 'vitest';
-import { loadDatabaseSettings } from '../../../src/app/config/database.js';
-import { loadAdminSettings } from '../../../src/app/config/service.js';
-import { adminProgram } from '../../../src/adapters/cli/admin.js';
+import { loadDatabaseSettings } from '../../../src/app/config/database.ts';
+import { loadAdminSettings } from '../../../src/app/config/service.ts';
+import { adminProgram } from '../../../src/adapters/cli/admin.ts';
 const temporary: string[] = [];
 afterEach(() => {
   for (const directory of temporary.splice(0))

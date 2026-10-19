@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
 import { Unzip, UnzipInflate } from 'fflate';
 import { parse } from 'smol-toml';
-import { canonical, gitSha, safePath, sha256 } from '../../kernel/values.js';
-import { requireThat } from '../../kernel/errors.js';
-import type { Batch } from './model.js';
-import type { Project } from '../contracts/project.js';
-import type { Run } from '../ci/model.js';
+import { canonical, gitSha, safePath, sha256 } from '../../kernel/values.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import type { Batch } from './model.ts';
+import type { Project } from '../contracts/project.ts';
+import type { Run } from '../ci/model.ts';
 
 export interface Prepared {
   schema: 1;

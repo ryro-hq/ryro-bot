@@ -1,5 +1,5 @@
 import { Context, Effect } from 'effect';
-import type { GitHubAPI, Pull, Run } from './model.js';
+import type { GitHubAPI, Pull, Run } from './model.ts';
 export class GitHubProvider extends Context.Service<
   GitHubProvider,
   {
@@ -7,7 +7,7 @@ export class GitHubProvider extends Context.Service<
     forRepository(
       repository: string,
       signal?: AbortSignal,
-      job?: import('../../kernel/contracts/jobs.js').Job,
+      job?: import('../../kernel/contracts/jobs.ts').Job,
     ): GitHubAPI;
   }
 >()('ryro/GitHubProvider') {}

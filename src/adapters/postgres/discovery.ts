@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { Effect, Layer } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import { sha256 } from '../../kernel/values.js';
-import { DiscoveryStore } from '../../modules/catalog/contracts.js';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import { sha256 } from '../../kernel/values.ts';
+import { DiscoveryStore } from '../../modules/catalog/contracts.ts';
 
 export const discoveryStoreLayer = Layer.effect(
   DiscoveryStore,

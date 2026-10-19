@@ -1,7 +1,7 @@
-import { canonical, component, gitSha, sha256 } from '../../kernel/values.js';
-import { requireThat } from '../../kernel/errors.js';
-import type { Batch, Candidate } from './model.js';
-import type { Project } from '../contracts/project.js';
+import { canonical, component, gitSha, sha256 } from '../../kernel/values.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import type { Batch, Candidate } from './model.ts';
+import type { Project } from '../contracts/project.ts';
 
 export function versionCompare(a: string, b: string): number {
   const left = a.match(/\d+|\D+/g) ?? [],

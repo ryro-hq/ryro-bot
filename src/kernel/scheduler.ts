@@ -1,6 +1,6 @@
 import { Cause, Effect } from 'effect';
-import type { ModuleRegistry } from './modules.js';
-import { reap } from './jobs.js';
+import type { ModuleRegistry } from './modules.ts';
+import { reap } from './jobs.ts';
 export const schedule = <R>(registry: ModuleRegistry<R>, now = Date.now()) =>
   Effect.gen(function* () {
     yield* reap;

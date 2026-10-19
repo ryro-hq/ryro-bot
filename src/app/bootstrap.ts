@@ -1,19 +1,19 @@
 import { Cause, Effect, Layer } from 'effect';
-import type { Settings } from './config/service.js';
-import { builtinModules } from './modules.js';
-import { checkDurability } from '../adapters/postgres/client.js';
-import { checkMigrations } from '../adapters/postgres/migrations.js';
-import { persistenceLayer } from '../adapters/postgres/layers.js';
-import { githubProviderLayer } from '../adapters/github/provider.js';
-import { pageFetcherLayer } from '../adapters/http/client.js';
-import { webhookServer } from '../adapters/http/webhooks.js';
+import type { Settings } from './config/service.ts';
+import { builtinModules } from './modules.ts';
+import { checkDurability } from '../adapters/postgres/client.ts';
+import { checkMigrations } from '../adapters/postgres/migrations.ts';
+import { persistenceLayer } from '../adapters/postgres/layers.ts';
+import { githubProviderLayer } from '../adapters/github/provider.ts';
+import { pageFetcherLayer } from '../adapters/http/client.ts';
+import { webhookServer } from '../adapters/http/webhooks.ts';
 import {
   pullTrackerLayer,
   workflowDispatchLayer,
-} from '../modules/ci/service.js';
-import { JobStore } from '../kernel/contracts/persistence.js';
-import { schedule } from '../kernel/scheduler.js';
-import { workOnce } from '../kernel/worker.js';
+} from '../modules/ci/service.ts';
+import { JobStore } from '../kernel/contracts/persistence.ts';
+import { schedule } from '../kernel/scheduler.ts';
+import { workOnce } from '../kernel/worker.ts';
 
 export const registerProjects = (settings: Settings) =>
   Effect.gen(function* () {

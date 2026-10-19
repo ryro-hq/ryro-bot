@@ -1,9 +1,9 @@
 import { NodeRuntime, NodeServices } from '@effect/platform-node';
 import { Effect } from 'effect';
-import { loadSettings } from './app/config/service.js';
-import { BotError } from './kernel/errors.js';
-import { databaseLayer } from './adapters/postgres/client.js';
-import { service } from './app/bootstrap.js';
+import { loadSettings } from './app/config/service.ts';
+import { BotError } from './kernel/errors.ts';
+import { databaseLayer } from './adapters/postgres/client.ts';
+import { service } from './app/bootstrap.ts';
 
 NodeRuntime.runMain(
   Effect.gen(function* () {

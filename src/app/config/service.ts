@@ -1,15 +1,15 @@
 import { createPrivateKey } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { Redacted, Schema } from 'effect';
-import { gitSha } from '../../kernel/values.js';
-import { requireThat } from '../../kernel/errors.js';
+import { gitSha } from '../../kernel/values.ts';
+import { requireThat } from '../../kernel/errors.ts';
 import type {
   Binding,
   Mode,
   Project,
-} from '../../modules/contracts/project.js';
-import { fileValue, loadDatabaseSettings } from './database.js';
-import { loadProjects } from './registry.js';
+} from '../../modules/contracts/project.ts';
+import { fileValue, loadDatabaseSettings } from './database.ts';
+import { loadProjects } from './registry.ts';
 export interface Settings {
   mode: Mode;
   revision: string;
@@ -101,9 +101,9 @@ export function loadAdminSettings(env = process.env): AdminSettings {
     mode: mode as Mode,
     revision: gitSha(env.RYRO_POLICY_REVISION ?? ''),
     version: gitSha(env.RYRO_BOT_VERSION ?? ''),
-    appId: env.GITHUB_APP_ID,
-    appKey,
-    appLogin: env.GITHUB_APP_LOGIN,
+    ...(env.GITHUB_APP_ID ? { appId: env.GITHUB_APP_ID } : {}),
+    ...(appKey ? { appKey } : {}),
+    ...(env.GITHUB_APP_LOGIN ? { appLogin: env.GITHUB_APP_LOGIN } : {}),
     projects,
     bindings: normalized,
     schedulerSeconds,

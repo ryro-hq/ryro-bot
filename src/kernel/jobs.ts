@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
-import { JobStore } from './contracts/persistence.js';
-import type { JobIntent } from './contracts/persistence.js';
-import type { Job } from './contracts/jobs.js';
+import { JobStore } from './contracts/persistence.ts';
+import type { JobIntent } from './contracts/persistence.ts';
+import type { Job } from './contracts/jobs.ts';
 export const enqueue = (
   repository: string,
   kind: string,

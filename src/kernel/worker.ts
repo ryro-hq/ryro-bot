@@ -1,8 +1,8 @@
 import { Cause, Effect } from 'effect';
-import { BotError } from './errors.js';
-import { DeferredError } from './operations.js';
-import type { ModuleRegistry } from './modules.js';
-import { claim, finish, renew } from './jobs.js';
+import { BotError } from './errors.ts';
+import { DeferredError } from './operations.ts';
+import type { ModuleRegistry } from './modules.ts';
+import { claim, finish, renew } from './jobs.ts';
 export const workOnce = <R>(
   registry: ModuleRegistry<R>,
   heartbeatMilliseconds = 30000,

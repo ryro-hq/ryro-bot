@@ -1,11 +1,11 @@
 import { Cause, Effect, Layer } from 'effect';
-import { CIStore, PullTracker, WorkflowDispatch } from './contracts.js';
+import { CIStore, PullTracker, WorkflowDispatch } from './contracts.ts';
 import {
   JobStore,
   OperationStore,
-} from '../../kernel/contracts/persistence.js';
-import { DeferredError, remote } from '../../kernel/operations.js';
-import { requireThat } from '../../kernel/errors.js';
+} from '../../kernel/contracts/persistence.ts';
+import { DeferredError, remote } from '../../kernel/operations.ts';
+import { requireThat } from '../../kernel/errors.ts';
 
 export const pullTrackerLayer = Layer.effect(
   PullTracker,
@@ -19,7 +19,7 @@ export const pullTrackerLayer = Layer.effect(
           let scan = yield* store.scan(repository);
           for (let count = 0; count < 2 && !scan.complete; count++) {
             const page = yield* remote(() =>
-              api.get<import('./model.js').Pull[]>(
+              api.get<import('./model.ts').Pull[]>(
                 `/repos/${repository}/pulls?state=all&sort=created&direction=desc&per_page=100&page=${scan.page}`,
               ),
             );
@@ -47,7 +47,7 @@ export const pullTrackerLayer = Layer.effect(
                 previous.state === 'closed'
                   ? previous
                   : yield* remote(() =>
-                      api.get<import('./model.js').Pull>(
+                      api.get<import('./model.ts').Pull>(
                         `/repos/${repository}/pulls/${previous.number}`,
                       ),
                     ),

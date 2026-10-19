@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { Schema } from 'effect';
-import { component } from '../../kernel/values.js';
-import { requireThat } from '../../kernel/errors.js';
-import type { Project } from '../../modules/contracts/project.js';
+import { component } from '../../kernel/values.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import type { Project } from '../../modules/contracts/project.ts';
 export function validateProject(project: Project): Project {
   requireThat(
     /^[\w-]+\/[\w.-]+$/.test(project.repository) &&

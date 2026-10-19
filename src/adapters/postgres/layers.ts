@@ -1,10 +1,10 @@
 import { Layer } from 'effect';
-import { jobStoreLayer } from './jobs.js';
-import { auditStoreLayer } from './audit.js';
-import { catalogStoreLayer } from './catalog.js';
-import { discoveryStoreLayer } from './discovery.js';
-import { operationStoreLayer } from './operations.js';
-import { ciStoreLayer } from './ci.js';
+import { jobStoreLayer } from './jobs.ts';
+import { auditStoreLayer } from './audit.ts';
+import { catalogStoreLayer } from './catalog.ts';
+import { discoveryStoreLayer } from './discovery.ts';
+import { operationStoreLayer } from './operations.ts';
+import { ciStoreLayer } from './ci.ts';
 
 export const persistenceLayer = Layer.mergeAll(
   jobStoreLayer,

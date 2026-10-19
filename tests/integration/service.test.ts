@@ -1,12 +1,12 @@
 import { Effect, Fiber, Redacted } from 'effect';
 import { SqlClient } from 'effect/sql';
 import { beforeAll, afterAll, describe, expect, it } from 'vitest';
-import { postgresTest } from '../support/postgres.js';
-import { service } from '../../src/app/bootstrap.js';
-import { migrate } from '../../src/adapters/postgres/migrations.js';
-import { decodeProjects } from '../../src/app/config/registry.js';
-import { base, revision } from '../support/projects.js';
-import type { Settings } from '../../src/app/config/service.js';
+import { postgresTest } from '../support/postgres.ts';
+import { service } from '../../src/app/bootstrap.ts';
+import { migrate } from '../../src/adapters/postgres/migrations.ts';
+import { decodeProjects } from '../../src/app/config/registry.ts';
+import { base, revision } from '../support/projects.ts';
+import type { Settings } from '../../src/app/config/service.ts';
 
 describe.skipIf(!process.env.TEST_DATABASE_URL)('service lifecycle', () => {
   const db = postgresTest(),

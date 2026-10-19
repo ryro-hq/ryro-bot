@@ -2,22 +2,22 @@ import { createHmac, randomUUID } from 'node:crypto';
 import { Effect, Redacted } from 'effect';
 import { SqlClient } from 'effect/sql';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { postgresTest } from '../support/postgres.js';
-import { FakeGitHub } from '../support/github.js';
-import { pilot, base, revision } from '../support/projects.js';
-import { migrate } from '../../src/adapters/postgres/migrations.js';
-import { builtinModules } from '../../src/app/modules.js';
-import { schedule } from '../../src/kernel/scheduler.js';
-import { workOnce } from '../../src/kernel/worker.js';
-import { JobStore } from '../../src/kernel/contracts/persistence.js';
-import { GitHubProvider } from '../../src/modules/ci/contracts.js';
+import { postgresTest } from '../support/postgres.ts';
+import { FakeGitHub } from '../support/github.ts';
+import { pilot, base, revision } from '../support/projects.ts';
+import { migrate } from '../../src/adapters/postgres/migrations.ts';
+import { builtinModules } from '../../src/app/modules.ts';
+import { schedule } from '../../src/kernel/scheduler.ts';
+import { workOnce } from '../../src/kernel/worker.ts';
+import { JobStore } from '../../src/kernel/contracts/persistence.ts';
+import { GitHubProvider } from '../../src/modules/ci/contracts.ts';
 import {
   CatalogStore,
   PageFetcher,
-} from '../../src/modules/catalog/contracts.js';
-import { webhookServer } from '../../src/adapters/http/webhooks.js';
-import type { Settings } from '../../src/app/config/service.js';
-import { decodeProjects } from '../../src/app/config/registry.js';
+} from '../../src/modules/catalog/contracts.ts';
+import { webhookServer } from '../../src/adapters/http/webhooks.ts';
+import type { Settings } from '../../src/app/config/service.ts';
+import { decodeProjects } from '../../src/app/config/registry.ts';
 
 describe.skipIf(!process.env.TEST_DATABASE_URL)(
   'webhook → persistent modules → isolated Actions evidence',

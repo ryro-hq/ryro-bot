@@ -1,28 +1,28 @@
 import { Effect, Schema } from 'effect';
-import { JobStore, AuditStore } from '../kernel/contracts/persistence.js';
-import type { JobIntent } from '../kernel/contracts/persistence.js';
-import type { BotModule } from '../kernel/contracts/modules.js';
-import { registerModules } from '../kernel/modules.js';
-import { requireThat } from '../kernel/errors.js';
-import { request } from '../kernel/jobs.js';
-import { remote } from '../kernel/operations.js';
+import { JobStore, AuditStore } from '../kernel/contracts/persistence.ts';
+import type { JobIntent } from '../kernel/contracts/persistence.ts';
+import type { BotModule } from '../kernel/contracts/modules.ts';
+import { registerModules } from '../kernel/modules.ts';
+import { requireThat } from '../kernel/errors.ts';
+import { request } from '../kernel/jobs.ts';
+import { remote } from '../kernel/operations.ts';
 import {
   CatalogStore,
   DiscoveryStore,
   PageFetcher,
-} from '../modules/catalog/contracts.js';
+} from '../modules/catalog/contracts.ts';
 import {
   CIStore,
   GitHubProvider,
   PullTracker,
   WorkflowDispatch,
-} from '../modules/ci/contracts.js';
-import { discover } from '../modules/catalog/discovery.js';
-import { reconcileProject } from '../modules/catalog/reconcile.js';
-import { reconcileCI } from '../modules/ci/reconcile.js';
-import { routeOpenPulls } from '../modules/reviews/service.js';
-import type { AutomationSettings } from '../modules/contracts/settings.js';
-import { enabled } from './config/registry.js';
+} from '../modules/ci/contracts.ts';
+import { discover } from '../modules/catalog/discovery.ts';
+import { reconcileProject } from '../modules/catalog/reconcile.ts';
+import { reconcileCI } from '../modules/ci/reconcile.ts';
+import { routeOpenPulls } from '../modules/reviews/service.ts';
+import type { AutomationSettings } from '../modules/contracts/settings.ts';
+import { enabled } from './config/registry.ts';
 
 type Services =
   | JobStore

@@ -1,13 +1,13 @@
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Layer } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { requireThat } from '../../kernel/errors.js';
-import { CatalogStore } from '../../modules/catalog/contracts.js';
+import { requireThat } from '../../kernel/errors.ts';
+import { CatalogStore } from '../../modules/catalog/contracts.ts';
 import type {
   BatchRecord,
   ReleaseRow,
-} from '../../modules/catalog/contracts.js';
-import type { Prepared } from '../../modules/catalog/evidence.js';
+} from '../../modules/catalog/contracts.ts';
+import type { Prepared } from '../../modules/catalog/evidence.ts';
 
 export const catalogStoreLayer = Layer.effect(
   CatalogStore,

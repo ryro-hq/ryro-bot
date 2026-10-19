@@ -1,17 +1,17 @@
 import { PgClient } from '@effect/sql-pg';
 import { Console, Effect } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { enqueue, registerRepository } from './jobs.js';
-import { audit } from './audit.js';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import type { AdminSettings } from '../../app/config/service.js';
-import type { BatchRecord } from '../../modules/catalog/contracts.js';
-import { GitHub } from '../github/client.js';
-import { remote } from '../../kernel/operations.js';
+import { enqueue, registerRepository } from './jobs.ts';
+import { audit } from './audit.ts';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import type { AdminSettings } from '../../app/config/service.ts';
+import type { BatchRecord } from '../../modules/catalog/contracts.ts';
+import { GitHub } from '../github/client.ts';
+import { remote } from '../../kernel/operations.ts';
 import {
   admitPrepared,
   unzipPrepared,
-} from '../../modules/catalog/evidence.js';
+} from '../../modules/catalog/evidence.ts';
 
 export const adminStatus = Effect.gen(function* () {
   const sql = yield* SqlClient.SqlClient;

@@ -1,12 +1,12 @@
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { registerModules } from '../../../src/kernel/modules.js';
-import { workOnce } from '../../../src/kernel/worker.js';
-import { JobStore } from '../../../src/kernel/contracts/persistence.js';
-import type { BotModule } from '../../../src/kernel/contracts/modules.js';
-import type { Job } from '../../../src/kernel/contracts/jobs.js';
-import { BotError } from '../../../src/kernel/errors.js';
-import { DeferredError } from '../../../src/kernel/operations.js';
+import { registerModules } from '../../../src/kernel/modules.ts';
+import { workOnce } from '../../../src/kernel/worker.ts';
+import { JobStore } from '../../../src/kernel/contracts/persistence.ts';
+import type { BotModule } from '../../../src/kernel/contracts/modules.ts';
+import type { Job } from '../../../src/kernel/contracts/jobs.ts';
+import { BotError } from '../../../src/kernel/errors.ts';
+import { DeferredError } from '../../../src/kernel/operations.ts';
 
 const job: Job = {
   id: 'job',

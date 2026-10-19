@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { requireThat } from './errors.js';
+import { requireThat } from './errors.ts';
 export const sha256 = (bytes: string | Uint8Array) =>
   createHash('sha256').update(bytes).digest('hex');
 export const canonical = (value: unknown): string => {

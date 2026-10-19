@@ -3,34 +3,34 @@ import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { Redacted } from 'effect';
 import { zipSync, strToU8 } from 'fflate';
-import { canonical, sha256 } from '../../../src/kernel/values.js';
-import type { Batch, Candidate } from '../../../src/modules/catalog/model.js';
-import type { Project } from '../../../src/modules/contracts/project.js';
-import { admitBaseConfig } from '../../../src/kernel/policy.js';
+import { canonical, sha256 } from '../../../src/kernel/values.ts';
+import type { Candidate } from '../../../src/modules/catalog/model.ts';
+import type { Project } from '../../../src/modules/contracts/project.ts';
+import { admitBaseConfig } from '../../../src/kernel/policy.ts';
 import {
   ownershipArtifacts,
   route,
-} from '../../../src/modules/reviews/policy.js';
-import { validateProject } from '../../../src/app/config/registry.js';
-import { plan, reconcile } from '../../../src/modules/catalog/planner.js';
-import type { Snapshot } from '../../../src/modules/catalog/planner.js';
+} from '../../../src/modules/reviews/policy.ts';
+import { validateProject } from '../../../src/app/config/registry.ts';
+import { plan, reconcile } from '../../../src/modules/catalog/planner.ts';
+import type { Snapshot } from '../../../src/modules/catalog/planner.ts';
 import {
   admitWebhook,
   verifySignature,
-} from '../../../src/adapters/http/webhooks.js';
-import { parsePage } from '../../../src/modules/catalog/discovery.js';
-import { sameOrigin } from '../../../src/kernel/urls.js';
+} from '../../../src/adapters/http/webhooks.ts';
+import { parsePage } from '../../../src/modules/catalog/discovery.ts';
+import { sameOrigin } from '../../../src/kernel/urls.ts';
 import {
   admitPrepared,
   publicationReady,
   unzipPrepared,
   verifyCatalogAddition,
-} from '../../../src/modules/catalog/evidence.js';
+} from '../../../src/modules/catalog/evidence.ts';
 import type {
   Prepared,
   PublicationEvidence,
-} from '../../../src/modules/catalog/evidence.js';
-import type { Run } from '../../../src/adapters/github/client.js';
+} from '../../../src/modules/catalog/evidence.ts';
+import type { Run } from '../../../src/adapters/github/client.ts';
 
 export const project: Project = validateProject(
   JSON.parse(

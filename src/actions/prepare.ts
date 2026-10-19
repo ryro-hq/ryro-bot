@@ -17,13 +17,13 @@ import {
   gitSha,
   safePath,
   sha256,
-} from '../kernel/values.js';
-import { requireThat } from '../kernel/errors.js';
-import type { Batch } from '../modules/catalog/model.js';
-import type { Prepared } from '../modules/catalog/evidence.js';
-import { verifyCatalogAddition } from '../modules/catalog/evidence.js';
-import { admitBaseConfig } from '../kernel/policy.js';
-import { decodeProjects } from '../app/config/registry.js';
+} from '../kernel/values.ts';
+import { requireThat } from '../kernel/errors.ts';
+import type { Batch } from '../modules/catalog/model.ts';
+import type { Prepared } from '../modules/catalog/evidence.ts';
+import { verifyCatalogAddition } from '../modules/catalog/evidence.ts';
+import { admitBaseConfig } from '../kernel/policy.ts';
+import { decodeProjects } from '../app/config/registry.ts';
 
 // This entry point runs in the read-only Actions job, never in the App service.
 export function prepare(
