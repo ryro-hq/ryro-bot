@@ -2,14 +2,25 @@
 
 Discuss larger behavior changes in an issue; send small fixes as pull requests.
 Include the triggering case, expected behavior and focused verification. Run
-`npm run verify` (formatting, lint, types, tests and build) and the PostgreSQL suite for persistence or reconciliation changes.
-Use local product checks for recipe work. Security reports follow `SECURITY.md`.
+checks appropriate to the change. Security reports follow [SECURITY.md](SECURITY.md).
+
+## Development checks
+
+`npm run verify` runs formatting, lint, types, tests and build. Set
+`TEST_DATABASE_URL` to include the PostgreSQL integration and end-to-end tests;
+these are required for persistence or reconciliation changes and run in CI.
+Use local product checks for recipe work. Documentation-only edits need
+formatting and link checks; they do not require new application tests.
 
 Hooks are managed by `simple-git-hooks` in `package.json` and installed by
 `npm install`. After `npm ci --ignore-scripts`, run `npm run hooks:install`.
 The pre-commit hook runs `npm run quality`; CI requires the same formatting,
 type-aware Oxlint and TypeScript checks. Use `npm run format` and `npm run lint:fix`
-for automatic fixes. Commitlint checks subjects locally and in CI: `type(scope): description`,
+for automatic fixes.
+
+## Commits and DCO
+
+Commitlint checks subjects locally and in CI: `type(scope): description`,
 for example `fix(queue): renew worker leases` or `chore(deps): update dependencies`.
 Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
 `ci`, `revert`. Scope is required and lowercase; breaking changes may use
@@ -21,12 +32,14 @@ by adding their own `Signed-off-by: Name <email>` trailer (`git commit -s`).
 The [CNCF DCO2 App](https://github.com/cncf/dco2) validates sign-offs. Repository
 rules require its `DCO` check from that App. It exempts bots and merge commits;
 keep bot sign-offs and fix missing sign-offs instead of overriding the check.
-`.github/dco.yml` requires member sign-offs, disables remediation and disables
+[`.github/dco.yml`](.github/dco.yml) requires member sign-offs, disables remediation and disables
 the App's override action. DCO2 reads this file from the default branch and may
 cache it for an hour, so configuration changes take effect after merging there
 and cache expiry.
 Do not add another person's sign-off. Contributions use the repository license.
 Retain upstream notices and identify copied code, sources, patches and licenses.
+
+## Review and merge queue
 
 While `@fullzer4` is the only maintainer, `ryro-bot` temporarily requires zero
 approvals; CODEOWNER and last-push approval requirements are disabled. Resolve
@@ -41,6 +54,8 @@ DCO sign-offs and individual commit messages are preserved; squash and merge com
 DCO and commit subjects are checked on each PR before queue admission.
 DCO2 reports success on merge groups based on admission; it does not revalidate
 their commits. The required App check and absence of ruleset bypasses are essential.
+
+## Policy and upstream changes
 
 Changes to registry, workflows, permissions, rollout gates and security policy
 require explicit security review. Rules for a proposed change are loaded from
@@ -66,6 +81,9 @@ Actions variable `RELEASE_APP_CLIENT_ID` and its PEM private key as secret
 workflows. The official token Action creates temporary tokens; the App needs
 no package permissions or ruleset bypass.
 
+This release App is separate from the runtime App configured with `GITHUB_APP_*`;
+its credentials are used only by the release automation in GitHub Actions.
+
 The proposal is formatted and committed with the App's identity and DCO
 sign-off as `chore(release): X.Y.Z`. Review it and use the existing merge queue;
 CI and DCO checks remain required. The App never approves or merges the PR.
@@ -87,4 +105,16 @@ settings and verify that an anonymous `docker pull` succeeds. Deployment and
 production migrations remain manual.
 
 Keep external Actions pinned by SHA. Validate workflow edits with `actionlint`
-and follow the existing `npm run verify` checks.
+and run the relevant development checks.
+
+## Assessment records
+
+The README's CI badge reports workflow status; DCO and license badges describe
+requirements, not security certifications. Version and container badges wait
+until a public release and anonymous image download have been verified.
+
+[OpenSSF Scorecard](governance/scorecard.json) and
+[OpenSSF Best Practices](governance/best-practices.json) are recorded as
+`not-assessed`. The [OSPS assessment](governance/osps/ryro-bot.json) is
+`not-certified`. These files record gaps and evidence; they do not claim a
+completed assessment or certification.
