@@ -1,6 +1,6 @@
 import { Context, Effect } from 'effect';
-import type { Batch, Candidate } from './model.js';
-import type { Prepared } from './evidence.js';
+import type { Batch, Candidate } from './model.ts';
+import type { Prepared } from './evidence.ts';
 export interface BatchRecord {
   batch_id: string;
   intent: Batch;

@@ -1,9 +1,9 @@
 import { PgMigrator } from '@effect/sql-pg';
 import { Effect } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { BotError } from '../../kernel/errors.js';
-import initial from './migrations/001_central_bot.js';
-import runtime from './migrations/002_runtime.js';
+import { BotError } from '../../kernel/errors.ts';
+import initial from './migrations/001_central_bot.ts';
+import runtime from './migrations/002_runtime.ts';
 
 export const migrations = {
   '001_central_bot': initial,

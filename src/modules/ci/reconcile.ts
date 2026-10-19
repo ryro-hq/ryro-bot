@@ -1,10 +1,10 @@
 import { Effect } from 'effect';
-import { CIStore, GitHubProvider, PullTracker } from './contracts.js';
-import type { AutomationSettings } from '../contracts/settings.js';
-import type { Project } from '../contracts/project.js';
-import type { Job } from '../../kernel/contracts/jobs.js';
-import { remote } from '../../kernel/operations.js';
-import { requireThat } from '../../kernel/errors.js';
+import { CIStore, GitHubProvider, PullTracker } from './contracts.ts';
+import type { AutomationSettings } from '../contracts/settings.ts';
+import type { Project } from '../contracts/project.ts';
+import type { Job } from '../../kernel/contracts/jobs.ts';
+import { remote } from '../../kernel/operations.ts';
+import { requireThat } from '../../kernel/errors.ts';
 
 export const reconcileCI = (
   settings: AutomationSettings,

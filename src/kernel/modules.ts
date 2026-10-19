@@ -1,5 +1,5 @@
-import { requireThat } from './errors.js';
-import type { BotModule, JobDefinition } from './contracts/modules.js';
+import { requireThat } from './errors.ts';
+import type { BotModule, JobDefinition } from './contracts/modules.ts';
 export function registerModules<R>(modules: readonly BotModule<R>[]) {
   const ids = new Set(modules.map((m) => m.id));
   requireThat(ids.size === modules.length, 'duplicate-module');

@@ -1,9 +1,9 @@
 import { Effect } from 'effect';
-import { DiscoveryStore, PageFetcher } from './contracts.js';
-import { sameOrigin } from '../../kernel/urls.js';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import { canonical, component, sha256 } from '../../kernel/values.js';
-import type { Channel } from '../contracts/project.js';
+import { DiscoveryStore, PageFetcher } from './contracts.ts';
+import { sameOrigin } from '../../kernel/urls.ts';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import { canonical, component, sha256 } from '../../kernel/values.ts';
+import type { Channel } from '../contracts/project.ts';
 
 export function parsePage(
   body: Buffer,

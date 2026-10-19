@@ -1,9 +1,9 @@
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Layer } from 'effect';
-import { AuditStore } from '../../kernel/contracts/persistence.js';
+import { AuditStore } from '../../kernel/contracts/persistence.ts';
 import { SqlClient } from 'effect/sql';
-import { canonical, sha256 } from '../../kernel/values.js';
-import type { AuditContext } from '../../kernel/contracts/audit.js';
+import { canonical, sha256 } from '../../kernel/values.ts';
+import type { AuditContext } from '../../kernel/contracts/audit.ts';
 export const audit = (operation: string, context: AuditContext) =>
   Effect.gen(function* () {
     const sql = yield* SqlClient.SqlClient;

@@ -1,18 +1,18 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Console, Effect } from 'effect';
-import { loadAdminSettings } from '../../app/config/service.js';
-import { loadDatabaseSettings } from '../../app/config/database.js';
-import { loadProjects } from '../../app/config/registry.js';
-import { databaseLayer } from '../postgres/client.js';
+import { loadAdminSettings } from '../../app/config/service.ts';
+import { loadDatabaseSettings } from '../../app/config/database.ts';
+import { loadProjects } from '../../app/config/registry.ts';
+import { databaseLayer } from '../postgres/client.ts';
 import {
   checkMigrations,
   migrate,
   migrationStatus,
-} from '../postgres/migrations.js';
-import { administer, adminStatus } from '../postgres/admin.js';
-import { requireThat } from '../../kernel/errors.js';
-import { ownershipArtifacts, route } from '../../modules/reviews/policy.js';
+} from '../postgres/migrations.ts';
+import { administer, adminStatus } from '../postgres/admin.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import { ownershipArtifacts, route } from '../../modules/reviews/policy.ts';
 
 export const adminProgram = (argv: string[], env = process.env) =>
   Effect.gen(function* () {

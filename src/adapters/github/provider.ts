@@ -1,10 +1,10 @@
 import { Effect, Layer } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { GitHub } from './client.js';
-import { GitHubProvider } from '../../modules/ci/contracts.js';
-import { JobStore } from '../../kernel/contracts/persistence.js';
-import { requireThat } from '../../kernel/errors.js';
-import type { AdminSettings } from '../../app/config/service.js';
+import { GitHub } from './client.ts';
+import { GitHubProvider } from '../../modules/ci/contracts.ts';
+import { JobStore } from '../../kernel/contracts/persistence.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import type { AdminSettings } from '../../app/config/service.ts';
 
 export const githubProviderLayer = (settings: AdminSettings) =>
   Layer.effect(
@@ -35,7 +35,7 @@ export const githubProviderLayer = (settings: AdminSettings) =>
             {
               canonicalRepository:
                 project.canonicalRepository ?? project.repository,
-              signal,
+              ...(signal ? { signal } : {}),
               beforeWrite: async (path) => {
                 const dispatch = path.endsWith('/dispatches');
                 requireThat(

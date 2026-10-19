@@ -1,13 +1,13 @@
 import { NodeRuntime, NodeServices } from '@effect/platform-node';
 import { Effect, Console } from 'effect';
-import { loadDatabaseSettings } from './app/config/database.js';
-import { databaseLayer } from './adapters/postgres/client.js';
+import { loadDatabaseSettings } from './app/config/database.ts';
+import { databaseLayer } from './adapters/postgres/client.ts';
 import {
   migrate,
   migrationStatus,
   checkMigrations,
-} from './adapters/postgres/migrations.js';
-import { requireThat } from './kernel/errors.js';
+} from './adapters/postgres/migrations.ts';
+import { requireThat } from './kernel/errors.ts';
 
 export const migrationProgram = (args: string[], env = process.env) =>
   Effect.gen(function* () {

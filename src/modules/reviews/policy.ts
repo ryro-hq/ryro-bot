@@ -1,6 +1,6 @@
-import { safePath } from '../../kernel/values.js';
-import { requireThat } from '../../kernel/errors.js';
-import type { Project } from '../contracts/project.js';
+import { safePath } from '../../kernel/values.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import type { Project } from '../contracts/project.ts';
 
 function matches(path: string, pattern: string): boolean {
   const expression = pattern

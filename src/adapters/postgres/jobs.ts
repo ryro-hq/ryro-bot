@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Layer } from 'effect';
-import { JobStore } from '../../kernel/contracts/persistence.js';
-import type { JobIntent } from '../../kernel/contracts/persistence.js';
+import { JobStore } from '../../kernel/contracts/persistence.ts';
+import type { JobIntent } from '../../kernel/contracts/persistence.ts';
 import { SqlClient } from 'effect/sql';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import { sha256 } from '../../kernel/values.js';
-import type { Job } from '../../kernel/contracts/jobs.js';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import { sha256 } from '../../kernel/values.ts';
+import type { Job } from '../../kernel/contracts/jobs.ts';
 export const enqueue = (
   repository: string,
   kind: string,
@@ -66,7 +66,6 @@ export const receive = (
 
 export const claim = Effect.gen(function* () {
   const sql = yield* SqlClient.SqlClient;
-  const pg = yield* PgClient.PgClient;
   return yield* sql.withTransaction(
     Effect.gen(function* () {
       // A repository row serializes remote operations across workers and scheduler jobs.
@@ -94,7 +93,6 @@ export const claim = Effect.gen(function* () {
 export const renew = (job: Job) =>
   Effect.gen(function* () {
     const sql = yield* SqlClient.SqlClient;
-    const pg = yield* PgClient.PgClient;
     yield* sql.withTransaction(
       Effect.gen(function* () {
         const rows =
@@ -138,7 +136,6 @@ export const finish = (
 
 export const reap = Effect.gen(function* () {
   const sql = yield* SqlClient.SqlClient;
-  const pg = yield* PgClient.PgClient;
   yield* sql`UPDATE jobs SET state='dead',last_error='lease-expired-at-attempt-limit' WHERE state='running' AND lease_until<clock_timestamp() AND attempts>=max_attempts`;
 });
 

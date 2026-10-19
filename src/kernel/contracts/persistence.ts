@@ -1,6 +1,6 @@
 import { Context, Effect } from 'effect';
-import type { Job } from './jobs.js';
-import type { AuditContext } from './audit.js';
+import type { Job } from './jobs.ts';
+import type { AuditContext } from './audit.ts';
 
 export interface JobIntent {
   kind: string;

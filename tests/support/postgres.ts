@@ -3,16 +3,18 @@ import { NodeServices } from '@effect/platform-node';
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Layer, ManagedRuntime, Redacted } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { databaseLayer } from '../../src/adapters/postgres/client.js';
-import { persistenceLayer } from '../../src/adapters/postgres/layers.js';
-import { pageFetcherLayer } from '../../src/adapters/http/client.js';
+import { databaseLayer } from '../../src/adapters/postgres/client.ts';
+import { persistenceLayer } from '../../src/adapters/postgres/layers.ts';
+import { pageFetcherLayer } from '../../src/adapters/http/client.ts';
 import {
   pullTrackerLayer,
   workflowDispatchLayer,
-} from '../../src/modules/ci/service.js';
+} from '../../src/modules/ci/service.ts';
 
 // Every suite owns a separate schema, even when files run concurrently.
 export function postgresTest() {
+  if (process.env.CI === 'true' && !process.env.TEST_DATABASE_URL)
+    throw new Error('TEST_DATABASE_URL is required for PostgreSQL tests in CI');
   const url =
     process.env.TEST_DATABASE_URL ?? 'postgres://postgres:test@127.0.0.1/test';
   const schema = 'test_' + randomUUID().replaceAll('-', '');

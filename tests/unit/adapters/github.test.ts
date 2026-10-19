@@ -1,8 +1,8 @@
 import { generateKeyPairSync } from 'node:crypto';
 import { Redacted } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { GitHub } from '../../../src/adapters/github/client.js';
-import { sha256 } from '../../../src/kernel/values.js';
+import { GitHub } from '../../../src/adapters/github/client.ts';
+import { sha256 } from '../../../src/kernel/values.ts';
 
 const privateKey = Redacted.make(
   generateKeyPairSync('rsa', { modulusLength: 2048 })

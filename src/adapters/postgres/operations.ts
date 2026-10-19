@@ -1,8 +1,8 @@
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Layer } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { OperationStore } from '../../kernel/contracts/persistence.js';
-import type { Operation } from '../../kernel/contracts/persistence.js';
+import { OperationStore } from '../../kernel/contracts/persistence.ts';
+import type { Operation } from '../../kernel/contracts/persistence.ts';
 export const operationStoreLayer = Layer.effect(
   OperationStore,
   Effect.gen(function* () {

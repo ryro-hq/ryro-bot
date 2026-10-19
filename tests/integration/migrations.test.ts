@@ -1,13 +1,13 @@
 import { Effect } from 'effect';
 import { SqlClient } from 'effect/sql';
 import { beforeAll, afterAll, describe, expect, it } from 'vitest';
-import { postgresTest } from '../support/postgres.js';
+import { postgresTest } from '../support/postgres.ts';
 import {
   checkMigrations,
   migrate,
   migrationStatus,
-} from '../../src/adapters/postgres/migrations.js';
-import initial from '../../src/adapters/postgres/migrations/001_central_bot.js';
+} from '../../src/adapters/postgres/migrations.ts';
+import initial from '../../src/adapters/postgres/migrations/001_central_bot.ts';
 
 describe.skipIf(!process.env.TEST_DATABASE_URL)('migration lifecycle', () => {
   const db = postgresTest();

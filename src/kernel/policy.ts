@@ -1,6 +1,6 @@
 import { parse } from 'smol-toml';
-import { requireThat } from './errors.js';
-import { gitSha, sha256 } from './values.js';
+import { requireThat } from './errors.ts';
+import { gitSha, sha256 } from './values.ts';
 export interface BasePolicy {
   readonly policy: string;
 }

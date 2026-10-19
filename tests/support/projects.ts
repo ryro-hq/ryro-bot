@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { decodeProjects } from '../../src/app/config/registry.js';
+import { decodeProjects } from '../../src/app/config/registry.ts';
 export const pilot = () =>
   structuredClone(
     decodeProjects(

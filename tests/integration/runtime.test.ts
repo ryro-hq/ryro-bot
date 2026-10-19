@@ -2,19 +2,19 @@ import { randomUUID } from 'node:crypto';
 import { Effect } from 'effect';
 import { SqlClient } from 'effect/sql';
 import { beforeAll, afterAll, describe, expect, it } from 'vitest';
-import { postgresTest } from '../support/postgres.js';
-import { migrate } from '../../src/adapters/postgres/migrations.js';
+import { postgresTest } from '../support/postgres.ts';
+import { migrate } from '../../src/adapters/postgres/migrations.ts';
 import {
   claim,
   request,
   finish,
   registerRepository,
-} from '../../src/adapters/postgres/jobs.js';
-import { CIStore, WorkflowDispatch } from '../../src/modules/ci/contracts.js';
-import type { GitHubAPI, Run } from '../../src/modules/ci/model.js';
-import { OperationStore } from '../../src/kernel/contracts/persistence.js';
-import { DeferredError } from '../../src/kernel/operations.js';
-import { base } from '../support/projects.js';
+} from '../../src/adapters/postgres/jobs.ts';
+import { CIStore, WorkflowDispatch } from '../../src/modules/ci/contracts.ts';
+import type { GitHubAPI, Run } from '../../src/modules/ci/model.ts';
+import { OperationStore } from '../../src/kernel/contracts/persistence.ts';
+import { DeferredError } from '../../src/kernel/operations.ts';
+import { base } from '../support/projects.ts';
 
 describe.skipIf(!process.env.TEST_DATABASE_URL)(
   'persistent coordination',
@@ -200,9 +200,9 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('pull history recovery', () => {
   });
   afterAll(db.dispose);
   it('resumes historical pagination and remembers a new PR that later closes offline', async () => {
-    const { FakeGitHub } = await import('../support/github.js');
-    const { pilot } = await import('../support/projects.js');
-    const { PullTracker } = await import('../../src/modules/ci/contracts.js');
+    const { FakeGitHub } = await import('../support/github.ts');
+    const { pilot } = await import('../support/projects.ts');
+    const { PullTracker } = await import('../../src/modules/ci/contracts.ts');
     const project = pilot(),
       api = new FakeGitHub(project);
     const pull = (number: number, state: 'open' | 'closed') => ({

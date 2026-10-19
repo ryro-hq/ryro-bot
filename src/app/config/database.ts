@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { requireThat } from '../../kernel/errors.js';
+import { requireThat } from '../../kernel/errors.ts';
 export const fileValue = (env: NodeJS.ProcessEnv, name: string) => {
   requireThat(env[name], 'missing-' + name);
   const value = readFileSync(env[name], 'utf8').trim();
@@ -17,9 +17,9 @@ export function loadDatabaseSettings(env = process.env) {
   );
   return {
     databaseUrl,
-    databaseCa: env.PG_CA_FILE
-      ? readFileSync(env.PG_CA_FILE, 'utf8')
-      : undefined,
+    ...(env.PG_CA_FILE
+      ? { databaseCa: readFileSync(env.PG_CA_FILE, 'utf8') }
+      : {}),
     localDatabase: env.RYRO_LOCAL_DATABASE === 'true',
   };
 }

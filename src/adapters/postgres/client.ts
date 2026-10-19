@@ -1,7 +1,7 @@
 import { PgClient } from '@effect/sql-pg';
 import { Effect, Redacted } from 'effect';
 import { SqlClient } from 'effect/sql';
-import { BotError, requireThat } from '../../kernel/errors.js';
+import { BotError, requireThat } from '../../kernel/errors.ts';
 export function databaseLayer(url: string, ca?: string, local = false) {
   const parsed = new URL(url);
   requireThat(

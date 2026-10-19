@@ -2,9 +2,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
 import type { IncomingMessage } from 'node:http';
 import { Effect, Redacted } from 'effect';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import type { Settings } from '../../app/config/service.js';
-import { receive } from '../../kernel/jobs.js';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import type { Settings } from '../../app/config/service.ts';
+import { receive } from '../../kernel/jobs.ts';
 
 export function verifySignature(
   body: Buffer,

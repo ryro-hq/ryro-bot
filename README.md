@@ -1,7 +1,7 @@
 # ryro-bot
 
 Central GitHub App for Ryro open source maintenance, built with TypeScript,
-Effect and PostgreSQL. The initial pilot is `ryro-hq/srx-pkgs`.
+Effect and PostgreSQL. Node 24.12+ runs TypeScript directly. The initial pilot is `ryro-hq/srx-pkgs`.
 
 ```sh
 npm ci --ignore-scripts

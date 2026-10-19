@@ -1,11 +1,10 @@
 import { Effect } from 'effect';
-import { BotError } from './errors.js';
+import { BotError } from './errors.ts';
 export class DeferredError extends BotError {
-  constructor(
-    readonly retryAt: number,
-    code = 'github-rate-limited',
-  ) {
+  readonly retryAt: number;
+  constructor(retryAt: number, code = 'github-rate-limited') {
     super({ code });
+    this.retryAt = retryAt;
   }
 }
 export const remote = <A>(work: (signal: AbortSignal) => Promise<A>) =>

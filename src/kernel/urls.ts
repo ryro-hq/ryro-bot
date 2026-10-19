@@ -1,4 +1,4 @@
-import { requireThat } from './errors.js';
+import { requireThat } from './errors.ts';
 export function sameOrigin(url: string, authority: string) {
   const parsed = new URL(url),
     accepted = new URL(authority);

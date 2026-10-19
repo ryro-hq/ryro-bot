@@ -5,8 +5,9 @@ Include the triggering case, expected behavior and focused verification. Run
 `npm run verify` and the PostgreSQL suite for persistence or reconciliation changes.
 Use local product checks for recipe work. Security reports follow `SECURITY.md`.
 
-Run `npm run hooks:install` after cloning, including when installing dependencies
-with `--ignore-scripts`. Commit subjects must use `type(scope): description`,
+Hooks are managed by `simple-git-hooks` in `package.json` and installed by
+`npm install`. After `npm ci --ignore-scripts`, run `npm run hooks:install`.
+Commitlint checks subjects locally and in CI: `type(scope): description`,
 for example `fix(queue): renew worker leases` or `chore(deps): update dependencies`.
 Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
 `ci`, `revert`. Scope is required and lowercase; breaking changes may use
@@ -14,6 +15,7 @@ Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`, `bui
 
 Each contributor certifies the [Developer Certificate of Origin 1.1](https://developercertificate.org/)
 by adding their own `Signed-off-by: Name <email>` trailer (`git commit -s`).
+CI validates sign-offs using the pinned `KineticCafe/actions-dco` Action, including bots.
 Do not add another person's sign-off. Contributions use the repository license.
 Retain upstream notices and identify copied code, sources, patches and licenses.
 

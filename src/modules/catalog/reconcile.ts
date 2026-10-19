@@ -1,33 +1,33 @@
 import { Effect } from 'effect';
-import { CatalogStore } from './contracts.js';
-import type { BatchRecord } from './contracts.js';
+import { CatalogStore } from './contracts.ts';
+import type { BatchRecord } from './contracts.ts';
 import {
   GitHubProvider,
   PullTracker,
   WorkflowDispatch,
-} from '../ci/contracts.js';
+} from '../ci/contracts.ts';
 import { parse } from 'smol-toml';
-import { BotError, requireThat } from '../../kernel/errors.js';
-import { canonical, sha256 } from '../../kernel/values.js';
-import type { Candidate } from './model.js';
-import type { Project } from '../contracts/project.js';
-import type { AutomationSettings as Settings } from '../contracts/settings.js';
-import { audit, saveEvidence } from '../../kernel/audit.js';
-import { renew } from '../../kernel/jobs.js';
-import type { Job } from '../../kernel/contracts/jobs.js';
-import type { GitHubAPI as GitHub, Pull } from '../ci/model.js';
-import { remote } from '../../kernel/operations.js';
+import { BotError, requireThat } from '../../kernel/errors.ts';
+import { canonical, sha256 } from '../../kernel/values.ts';
+import type { Candidate } from './model.ts';
+import type { Project } from '../contracts/project.ts';
+import type { AutomationSettings as Settings } from '../contracts/settings.ts';
+import { audit, saveEvidence } from '../../kernel/audit.ts';
+import { renew } from '../../kernel/jobs.ts';
+import type { Job } from '../../kernel/contracts/jobs.ts';
+import type { GitHubAPI as GitHub, Pull } from '../ci/model.ts';
+import { remote } from '../../kernel/operations.ts';
 
-import { admitBaseConfig } from '../../kernel/policy.js';
-import { policyDigest } from '../contracts/policy.js';
-import { plan, reconcile } from './planner.js';
-import type { Snapshot } from './planner.js';
+import { admitBaseConfig } from '../../kernel/policy.ts';
+import { policyDigest } from '../contracts/policy.ts';
+import { plan, reconcile } from './planner.ts';
+import type { Snapshot } from './planner.ts';
 import {
   admitPrepared,
   blobSha,
   unzipPrepared,
   verifyCatalogAddition,
-} from './evidence.js';
+} from './evidence.ts';
 
 const marker = (id: string) => '<!-- ryro-bot:batch=' + id + ' -->';
 export const batchFromBody = (body: string | null) =>

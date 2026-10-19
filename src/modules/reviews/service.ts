@@ -1,13 +1,13 @@
 import { Effect } from 'effect';
-import type { AutomationSettings as Settings } from '../contracts/settings.js';
-import type { Project } from '../contracts/project.js';
-import { requireThat } from '../../kernel/errors.js';
-import { audit } from '../../kernel/audit.js';
-import { renew } from '../../kernel/jobs.js';
-import type { Job } from '../../kernel/contracts/jobs.js';
-import type { GitHubAPI as GitHub, Pull } from '../ci/model.js';
-import { admitBaseConfig } from '../../kernel/policy.js';
-import { route } from './policy.js';
+import type { AutomationSettings as Settings } from '../contracts/settings.ts';
+import type { Project } from '../contracts/project.ts';
+import { requireThat } from '../../kernel/errors.ts';
+import { audit } from '../../kernel/audit.ts';
+import { renew } from '../../kernel/jobs.ts';
+import type { Job } from '../../kernel/contracts/jobs.ts';
+import type { GitHubAPI as GitHub, Pull } from '../ci/model.ts';
+import { admitBaseConfig } from '../../kernel/policy.ts';
+import { route } from './policy.ts';
 
 // Keep the transport adapter local to avoid a runtime dependency cycle.
 const remote = <A>(work: () => Promise<A>) => Effect.tryPromise(work);

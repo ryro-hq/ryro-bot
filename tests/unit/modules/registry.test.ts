@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
-import { decodeProjects } from '../../../src/app/config/registry.js';
-import { builtinModules } from '../../../src/app/modules.js';
-import { base, revision } from '../../support/projects.js';
+import { decodeProjects } from '../../../src/app/config/registry.ts';
+import { builtinModules } from '../../../src/app/modules.ts';
+import { base, revision } from '../../support/projects.ts';
 it('enables CI without requiring a package catalog', async () => {
   const projects = decodeProjects({
     schema: 2,

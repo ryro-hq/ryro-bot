@@ -11,18 +11,18 @@ import {
   reap,
   receive,
   renew,
-} from '../../src/adapters/postgres/jobs.js';
-import { databaseLayer } from '../../src/adapters/postgres/client.js';
-import { migrate } from '../../src/adapters/postgres/migrations.js';
-import { saveEvidence } from '../../src/adapters/postgres/audit.js';
-import { discoveryStoreLayer } from '../../src/adapters/postgres/discovery.js';
-import { pageFetcherLayer } from '../../src/adapters/http/client.js';
+} from '../../src/adapters/postgres/jobs.ts';
+import { databaseLayer } from '../../src/adapters/postgres/client.ts';
+import { migrate } from '../../src/adapters/postgres/migrations.ts';
+import { saveEvidence } from '../../src/adapters/postgres/audit.ts';
+import { discoveryStoreLayer } from '../../src/adapters/postgres/discovery.ts';
+import { pageFetcherLayer } from '../../src/adapters/http/client.ts';
 import {
   DiscoveryStore,
   PageFetcher,
-} from '../../src/modules/catalog/contracts.js';
-import { discover } from '../../src/modules/catalog/discovery.js';
-import type { Channel } from '../../src/modules/contracts/project.js';
+} from '../../src/modules/catalog/contracts.ts';
+import { discover } from '../../src/modules/catalog/discovery.ts';
+import type { Channel } from '../../src/modules/contracts/project.ts';
 
 const url = process.env.TEST_DATABASE_URL;
 describe.skipIf(!url)('real PostgreSQL durability and recovery', () => {

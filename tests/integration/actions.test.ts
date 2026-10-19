@@ -3,8 +3,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { prepare } from '../../src/actions/prepare.js';
-import { canonical, sha256 } from '../../src/kernel/values.js';
+import { prepare } from '../../src/actions/prepare.ts';
+import { canonical, sha256 } from '../../src/kernel/values.ts';
 
 const directories: string[] = [];
 afterEach(() => {
