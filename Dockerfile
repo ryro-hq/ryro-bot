@@ -14,7 +14,7 @@ ENV RYRO_BOT_VERSION=${RYRO_BOT_VERSION}
 ENV HOST=0.0.0.0 PORT=8790
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
-COPY --chown=node:node package.json LICENSE NOTICE ./
+COPY --chown=node:node package.json LICENSE ./
 COPY --chown=node:node registry ./registry
 USER node
 EXPOSE 8790
