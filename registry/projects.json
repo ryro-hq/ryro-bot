@@ -1,8 +1,8 @@
 {
-  "schema": 1,
+  "schema": 2,
   "projects": [
     {
-      "repository": "ryro-hq/syrox-pkgs",
+      "repository": "ryro-hq/srx-pkgs",
       "policy": "syrox-pkgs-v1",
       "baseBranch": "main",
       "fallback": ["@fullzer4"],
@@ -183,7 +183,10 @@
       "hosts": ["debian", "ubuntu-24.04"],
       "preparationWorkflow": "ryro-prepare.yml",
       "qualificationWorkflow": "catalog.yml",
-      "publicationEnabled": false
+      "publicationEnabled": false,
+      "repositoryId": 1380346000,
+      "aliases": ["ryro-hq/syrox-pkgs"],
+      "modules": ["ci", "catalog", "reviews"]
     }
   ]
 }
