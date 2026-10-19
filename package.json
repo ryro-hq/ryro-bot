@@ -15,7 +15,9 @@
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "verify": "npm run format:check && npm run check && npm test && npm run build",
-    "migrate": "node --import tsx src/migrate.ts"
+    "migrate": "node --import tsx src/migrate.ts",
+    "hooks:install": "git config --local core.hooksPath .githooks",
+    "commit:check": "node .githooks/commit-message.mjs"
   },
   "dependencies": {
     "@effect/platform-node": "4.0.0",
