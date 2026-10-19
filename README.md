@@ -5,6 +5,7 @@ Effect and PostgreSQL. The initial pilot is `ryro-hq/srx-pkgs`.
 
 ```sh
 npm ci --ignore-scripts
+npm run hooks:install
 npm run verify
 ```
 

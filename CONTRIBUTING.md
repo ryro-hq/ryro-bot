@@ -5,6 +5,13 @@ Include the triggering case, expected behavior and focused verification. Run
 `npm run verify` and the PostgreSQL suite for persistence or reconciliation changes.
 Use local product checks for recipe work. Security reports follow `SECURITY.md`.
 
+Run `npm run hooks:install` after cloning, including when installing dependencies
+with `--ignore-scripts`. Commit subjects must use `type(scope): description`,
+for example `fix(queue): renew worker leases` or `chore(deps): update dependencies`.
+Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
+`ci`, `revert`. Scope is required and lowercase; breaking changes may use
+`feat(api)!: description`. The `commit-msg` hook and PR CI check every new commit.
+
 Each contributor certifies the [Developer Certificate of Origin 1.1](https://developercertificate.org/)
 by adding their own `Signed-off-by: Name <email>` trailer (`git commit -s`).
 Do not add another person's sign-off. Contributions use the repository license.

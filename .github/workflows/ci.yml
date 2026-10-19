@@ -29,9 +29,15 @@ jobs:
       TEST_DATABASE_URL: postgres://postgres:local-test-only@127.0.0.1:5432/ryro_bot_test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with: { persist-credentials: false }
+        with: { persist-credentials: false, fetch-depth: 0 }
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with: { node-version: '24', cache: npm }
       - run: npm ci --ignore-scripts
+      - name: Validate commit messages
+        if: github.event_name == 'pull_request'
+        env:
+          COMMIT_BASE: ${{ github.event.pull_request.base.sha }}
+          COMMIT_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: npm run commit:check -- --from "$COMMIT_BASE" --to "$COMMIT_HEAD"
       - run: npm run verify
       - run: npm audit --omit=dev
