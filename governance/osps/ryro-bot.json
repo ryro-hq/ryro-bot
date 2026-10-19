@@ -348,7 +348,7 @@
     {
       "requirement": "OSPS-LE-01.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0101",
-      "evidence": ["LICENSE", "NOTICE", "CONTRIBUTING.md"],
+      "evidence": ["LICENSE", "CONTRIBUTING.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -356,7 +356,7 @@
     {
       "requirement": "OSPS-LE-02.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0201",
-      "evidence": ["LICENSE", "NOTICE", "CONTRIBUTING.md"],
+      "evidence": ["LICENSE", "CONTRIBUTING.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -364,7 +364,7 @@
     {
       "requirement": "OSPS-LE-02.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0202",
-      "evidence": ["LICENSE", "NOTICE", "CONTRIBUTING.md"],
+      "evidence": ["LICENSE", "CONTRIBUTING.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -372,7 +372,7 @@
     {
       "requirement": "OSPS-LE-03.01",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0301",
-      "evidence": ["LICENSE", "NOTICE", "CONTRIBUTING.md"],
+      "evidence": ["LICENSE", "CONTRIBUTING.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
@@ -380,7 +380,7 @@
     {
       "requirement": "OSPS-LE-03.02",
       "reference": "https://baseline.openssf.org/versions/2026-08-28.html#osps-le-0302",
-      "evidence": ["LICENSE", "NOTICE", "CONTRIBUTING.md"],
+      "evidence": ["LICENSE", "CONTRIBUTING.md"],
       "owner": "@fullzer4",
       "status": "partial-unverified",
       "pending": "Verify enforcement and record independently reviewed evidence at the deployed/source SHA; documentation alone is insufficient."
