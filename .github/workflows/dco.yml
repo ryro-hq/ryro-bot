@@ -12,6 +12,9 @@ permissions:
 
 jobs:
   DCO:
+    # Queue admission requires DCO on each PR; GitHub-generated merge commits are exempt.
+    # Keep this job visible as skipped on merge_group for the required check context.
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
