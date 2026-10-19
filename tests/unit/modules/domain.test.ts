@@ -290,6 +290,23 @@ describe('webhook and discovery boundaries', () => {
       sameOrigin('https://user@nginx.org/download/', c.origin),
     ).toThrow();
   });
+  it('decodes HTML entities once before validating pagination URLs', () => {
+    const c = project.packages.nginx.discovery!;
+    const next = (href: string) =>
+      parsePage(
+        Buffer.from(`<a rel="next" href="${href}">next</a>`),
+        new Headers(),
+        c.url,
+        c,
+      ).next;
+    expect(next('?literal=&amp;quot;')).toBe(c.url + '?literal=&quot;');
+    expect(next('?q=&quot;value&quot;&#38;page=2')).toBe(
+      c.url + '?q=%22value%22&page=2',
+    );
+    expect(() => next('?literal=&amp;#38;')).toThrow(
+      'untrusted-discovery-origin',
+    );
+  });
   it('retains API prereleases, excludes drafts and rejects cross-origin pagination', () => {
     const c = {
       ...project.packages.nginx.discovery!,
