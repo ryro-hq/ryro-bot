@@ -1,388 +1,46 @@
-name: Release
+name: Publish container
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Existing draft tag to resume (vX.Y.Z)
-        required: true
-        type: string
+  push:
+    tags: ['v*']
 
 permissions:
   contents: read
-  actions: read
-
-env:
-  GH_REPO: ryro-hq/ryro-bot
-
-defaults:
-  run:
-    shell: bash
+  packages: write
 
 concurrency:
-  group: release-main
+  group: container-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  prepare:
-    if: >-
-      vars.RELEASES_ENABLED == 'true' && github.repository == 'ryro-hq/ryro-bot' &&
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' ||
-      github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.head_repository.full_name == github.repository)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    outputs:
-      tag: ${{ steps.select.outputs.tag }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with: { ref: main, persist-credentials: false }
-      - uses: ./.github/actions/node
-      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
-        id: app
-        with:
-          app-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          repositories: ryro-bot
-          permission-contents: write
-          permission-pull-requests: write
-      - uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4.4.1
-        if: github.event_name == 'workflow_run'
-        id: release
-        with:
-          token: ${{ steps.app.outputs.token }}
-          target-branch: main
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        if: steps.release.outputs.prs_created == 'true'
-        with:
-          ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
-          token: ${{ steps.app.outputs.token }}
-          path: release-proposal
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Format and sign the proposal with the App identity
-        if: steps.release.outputs.prs_created == 'true'
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          APP_SLUG: ${{ steps.app.outputs.app-slug }}
-          RELEASE_BRANCH: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
-        run: |
-          login="${APP_SLUG}[bot]"
-          id=$(gh api "users/$login" --jq .id)
-          git -C release-proposal config user.name "$login"
-          git -C release-proposal config user.email "${id}+${login}@users.noreply.github.com"
-          original=$(git -C release-proposal rev-parse HEAD)
-          test "$(git -C release-proposal rev-list --count HEAD ^origin/main)" = 1
-          git -C release-proposal diff --quiet origin/main...HEAD -- . ':!package.json' ':!package-lock.json' ':!.release-please-manifest.json'
-          subject=$(git -C release-proposal log -1 --format=%s)
-          [[ "$subject" =~ ^chore\(release\):\ [0-9]+\.[0-9]+\.[0-9]+$ ]]
-          node_modules/.bin/oxfmt --config .oxfmtrc.json release-proposal/package.json release-proposal/package-lock.json release-proposal/.release-please-manifest.json
-          git -C release-proposal add package.json package-lock.json .release-please-manifest.json
-          git -C release-proposal -c core.hooksPath=/dev/null commit --amend --reset-author --signoff --message "$subject"
-          git -C release-proposal -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin "HEAD:$RELEASE_BRANCH" "--force-with-lease=refs/heads/$RELEASE_BRANCH:$original"
-      - name: Select the release draft
-        id: select
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.tag || steps.release.outputs.tag_name }}
-          CI_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          tag="$RELEASE_TAG"
-          if [[ -z "$tag" ]]; then
-            tag=$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" | jq -sr --arg sha "$CI_SHA" '[.[][] | select(.draft and .target_commitish == $sha)] | .[0].tag_name // empty')
-          fi
-          if [[ -n "$tag" ]]; then
-            [[ "$tag" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
-            echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          fi
-
   publish:
-    needs: prepare
-    if: needs.prepare.outputs.tag != ''
+    if: vars.RELEASES_ENABLED == 'true' && github.repository == 'ryro-hq/ryro-bot'
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    permissions:
-      contents: read
-      actions: read
-      packages: write
-    services:
-      postgres:
-        image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
-        env:
-          POSTGRES_PASSWORD: local-test-only
-          POSTGRES_DB: ryro_release
-        ports: [5432:5432]
-        options: --health-cmd "pg_isready -U postgres" --health-interval 2s --health-retries 30
-    env:
-      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with: { ref: main, persist-credentials: false, fetch-depth: 0 }
-      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
-        id: app
-        with:
-          app-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          repositories: ryro-bot
-          permission-contents: write
-      - name: Verify source and recover the candidate
-        id: source
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
-          version="${RELEASE_TAG#v}"
-          mkdir -p evidence
-          gh release view "$RELEASE_TAG" --json tagName,targetCommitish,isDraft,assets,body > evidence/draft.json
-          jq -e --arg tag "$RELEASE_TAG" '.isDraft and .tagName == $tag' evidence/draft.json
-          sha=$(jq -r .targetCommitish evidence/draft.json)
-          [[ "$sha" =~ ^[a-f0-9]{40}$ ]]
-          test "$(git rev-parse "refs/tags/$RELEASE_TAG")" = "$sha"
-          git merge-base --is-ancestor "$sha" origin/main
-          git show "$sha:package.json" | jq -e --arg v "$version" '.version == $v'
-          git show "$sha:package-lock.json" | jq -e --arg v "$version" '.version == $v and .packages[""].version == $v'
-          git show "$sha:.release-please-manifest.json" | jq -e --arg v "$version" '.["."] == $v'
-          ci_run=$(GH_TOKEN="$GITHUB_TOKEN" gh run list --workflow ci.yml --branch main --event push --commit "$sha" --limit 100 \
-            --json databaseId,status,conclusion,headSha,headBranch,event | \
-            jq -r --arg sha "$sha" '[.[] | select(.headSha == $sha and .headBranch == "main" and .event == "push" and .status == "completed" and .conclusion == "success")] | .[0].databaseId // empty')
-          [[ "$ci_run" =~ ^[1-9][0-9]*$ ]] || { echo 'No successful main push CI for the release SHA' >&2; exit 1; }
-          digest=''
-          qualified=false
-          if jq -e '.assets | any(.name == "candidate.json")' evidence/draft.json >/dev/null; then
-            gh release download "$RELEASE_TAG" --pattern candidate.json --dir evidence
-            jq -e --arg v "$version" --arg sha "$sha" '.version == $v and .sha == $sha and .image == "ghcr.io/ryro-hq/ryro-bot" and (.digest | test("^sha256:[a-f0-9]{64}$"))' evidence/candidate.json
-            digest=$(jq -r .digest evidence/candidate.json)
-          fi
-          if jq -e '.assets | any(.name == "SHA256SUMS")' evidence/draft.json >/dev/null; then
-            gh release download "$RELEASE_TAG" --dir evidence --pattern release.json --pattern sbom.spdx.json --pattern provenance.json --pattern SHA256SUMS
-            test "$(awk '{print $2}' evidence/SHA256SUMS | sort)" = "$(printf '%s\n' candidate.json release.json sbom.spdx.json provenance.json | sort)"
-            (cd evidence && sha256sum --check --strict SHA256SUMS)
-            jq -e --arg sha "$sha" --arg digest "$digest" --arg v "$version" '.sha == $sha and .version == $v and .digest == $digest and .platform == "linux/amd64" and .checks == {cli:true,migrations:true,health:true}' evidence/release.json
-            jq -e '.spdxVersion | startswith("SPDX-")' evidence/sbom.spdx.json
-            jq -e --slurpfile meta evidence/release.json '.predicate and (.predicateType | startswith("https://slsa.dev/provenance/")) and any(.subject[]; .digest.sha256 == $meta[0].platformDigest[7:])' evidence/provenance.json
-            qualified=true
-          fi
-          printf 'version=%s\nsha=%s\nci_run=https://github.com/%s/actions/runs/%s\ndigest=%s\nqualified=%s\n' \
-            "$version" "$sha" "$GH_REPO" "$ci_run" "$digest" "$qualified" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          ref: ${{ steps.source.outputs.sha }}
-          path: release-source
-          persist-credentials: false
+        with: { persist-credentials: false }
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-      - name: Build an attested candidate only when no digest was recorded
-        if: steps.source.outputs.digest == ''
-        id: build
+      - uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        id: meta
+        with:
+          images: ghcr.io/ryro-hq/ryro-bot
+          flavor: latest=false
+          tags: type=semver,pattern={{version}}
+          labels: org.opencontainers.image.licenses=Apache-2.0
+      - name: Build and push the versioned image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
-          context: release-source
+          context: .
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/ryro-hq/ryro-bot:candidate-${{ steps.source.outputs.version }}-${{ steps.source.outputs.sha }}
-          build-args: RYRO_BOT_VERSION=${{ steps.source.outputs.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: RYRO_BOT_VERSION=${{ github.sha }}
           sbom: true
           provenance: mode=max
-          labels: |
-            org.opencontainers.image.source=https://github.com/ryro-hq/ryro-bot
-            org.opencontainers.image.version=${{ steps.source.outputs.version }}
-            org.opencontainers.image.revision=${{ steps.source.outputs.sha }}
-            org.opencontainers.image.licenses=Apache-2.0
-      - name: Persist the candidate before qualification
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          CANDIDATE_DIGEST: ${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-          RELEASE_VERSION: ${{ steps.source.outputs.version }}
-          RELEASE_SHA: ${{ steps.source.outputs.sha }}
-        run: |
-          [[ "$CANDIDATE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          if [[ ! -f evidence/candidate.json ]]; then
-            jq -n --arg version "$RELEASE_VERSION" --arg sha "$RELEASE_SHA" --arg digest "$CANDIDATE_DIGEST" \
-              --arg run "$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID" \
-              '{version:$version,sha:$sha,digest:$digest,image:"ghcr.io/ryro-hq/ryro-bot",buildRun:$run}' > evidence/candidate.json
-            gh release upload "$RELEASE_TAG" evidence/candidate.json
-          fi
-          test "$(jq -r .digest evidence/candidate.json)" = "$CANDIDATE_DIGEST"
-      - name: Pull the exact candidate and check its compiled CLIs
-        if: steps.source.outputs.qualified != 'true'
-        env:
-          RELEASE_IMAGE: ghcr.io/ryro-hq/ryro-bot@${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-        run: |
-          docker pull --platform linux/amd64 "$RELEASE_IMAGE"
-          docker run --rm --read-only --cap-drop ALL "$RELEASE_IMAGE" node dist/admin.js --help
-          docker run --rm --read-only --cap-drop ALL "$RELEASE_IMAGE" node dist/migrate.js --help
-      - name: Apply and check migrations against temporary PostgreSQL
-        if: steps.source.outputs.qualified != 'true'
-        env:
-          RELEASE_IMAGE: ghcr.io/ryro-hq/ryro-bot@${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/release-secrets" evidence
-          printf '%s' 'postgres://postgres:local-test-only@127.0.0.1:5432/ryro_release' > "$RUNNER_TEMP/release-secrets/database-url"
-          printf '%s' 'release-smoke-test-webhook-secret-32-bytes' > "$RUNNER_TEMP/release-secrets/webhook-secret"
-          chmod 755 "$RUNNER_TEMP/release-secrets"
-          chmod 444 "$RUNNER_TEMP/release-secrets/database-url" "$RUNNER_TEMP/release-secrets/webhook-secret"
-          for command in apply apply check; do
-            timeout 90s docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges \
-              --network host --mount "type=bind,source=$RUNNER_TEMP/release-secrets,target=/run/secrets,readonly" \
-              -e DATABASE_URL_FILE=/run/secrets/database-url -e RYRO_LOCAL_DATABASE=true \
-              "$RELEASE_IMAGE" node dist/migrate.js "$command"
-          done
-      - name: Check health in observe mode
-        if: steps.source.outputs.qualified != 'true'
-        env:
-          RELEASE_IMAGE: ghcr.io/ryro-hq/ryro-bot@${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-          RELEASE_SHA: ${{ steps.source.outputs.sha }}
-        run: |
-          docker run -d --name ryro-release-smoke --read-only --cap-drop ALL --security-opt no-new-privileges \
-            --network host --mount "type=bind,source=$RUNNER_TEMP/release-secrets,target=/run/secrets,readonly" \
-            -e DATABASE_URL_FILE=/run/secrets/database-url -e RYRO_LOCAL_DATABASE=true \
-            -e GITHUB_WEBHOOK_SECRET_FILE=/run/secrets/webhook-secret -e RYRO_MODE=observe \
-            -e "RYRO_BOT_VERSION=$RELEASE_SHA" -e "RYRO_POLICY_REVISION=$RELEASE_SHA" "$RELEASE_IMAGE"
-          curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:8790/healthz
-          printf '{"cli":true,"migrations":true,"health":true}\n' > evidence/smoke.json
-      - name: Extract the SBOM and provenance from the same image index
-        if: steps.source.outputs.qualified != 'true'
-        id: attestations
-        env:
-          RELEASE_IMAGE: ghcr.io/ryro-hq/ryro-bot@${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          : "${RELEASE_IMAGE:?required image digest}"
-          [[ "$RELEASE_IMAGE" =~ ^ghcr.io/ryro-hq/ryro-bot@sha256:[a-f0-9]{64}$ ]]
-          mkdir -p evidence
-          docker buildx imagetools inspect --raw "$RELEASE_IMAGE" > evidence/index.json
-          platform_digest=$(jq -er '[.manifests[] | select(.platform.os == "linux" and .platform.architecture == "amd64")] | if length == 1 then .[0].digest else error("Expected one amd64 image") end' evidence/index.json)
-          [[ "$platform_digest" =~ ^sha256:[a-f0-9]{64}$ ]]
-          echo "platform_digest=$platform_digest" >> "${GITHUB_OUTPUT:?}"
-          attestation_digest=$(jq -er --arg digest "$platform_digest" '[.manifests[] | select(.annotations["vnd.docker.reference.digest"] == $digest and .annotations["vnd.docker.reference.type"] == "attestation-manifest")] | if length == 1 then .[0].digest else error("Expected platform attestations") end' evidence/index.json)
-          [[ "$attestation_digest" =~ ^sha256:[a-f0-9]{64}$ ]]
-          docker buildx imagetools inspect --raw "ghcr.io/ryro-hq/ryro-bot@$attestation_digest" > evidence/attestations.json
-          registry_token=$(curl --fail --silent --show-error --get https://ghcr.io/token \
-            --data-urlencode service=ghcr.io --data-urlencode scope=repository:ryro-hq/ryro-bot:pull \
-            --user "${GITHUB_ACTOR:?}:${GITHUB_TOKEN:?}" | jq -er .token)
-          for kind in sbom provenance; do
-            if [[ "$kind" == sbom ]]; then predicate=https://spdx.dev/Document; else predicate=https://slsa.dev/provenance/; fi
-            blob=$(jq -er --arg predicate "$predicate" '[.layers[] | select(.annotations["in-toto.io/predicate-type"] | startswith($predicate))] | if length == 1 then .[0].digest else error("Missing or ambiguous attestation") end' evidence/attestations.json)
-            [[ "$blob" =~ ^sha256:[a-f0-9]{64}$ ]]
-            curl --fail --silent --show-error --location -H "Authorization: Bearer $registry_token" \
-              "https://ghcr.io/v2/ryro-hq/ryro-bot/blobs/$blob" > "evidence/$kind.statement.json"
-            # Check the fetched bytes and statement subject before extracting its predicate.
-            [[ "sha256:$(sha256sum "evidence/$kind.statement.json" | cut -d ' ' -f 1)" == "$blob" ]]
-            jq -e --arg digest "${platform_digest#sha256:}" '.subject | any(.digest.sha256 == $digest)' "evidence/$kind.statement.json" >/dev/null
-          done
-          jq -e .predicate evidence/sbom.statement.json > evidence/sbom.spdx.json
-          cp evidence/provenance.statement.json evidence/provenance.json
-      - name: Attach qualification evidence with GitHub CLI
-        if: steps.source.outputs.qualified != 'true'
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          PLATFORM_DIGEST: ${{ steps.attestations.outputs.platform_digest }}
-          CI_RUN: ${{ steps.source.outputs.ci_run }}
-        run: |
-          jq -e '. == {cli:true,migrations:true,health:true}' evidence/smoke.json
-          jq -e '.spdxVersion | startswith("SPDX-")' evidence/sbom.spdx.json
-          jq -e '.predicateType | startswith("https://slsa.dev/provenance/")' evidence/provenance.json
-          jq -n --slurpfile candidate evidence/candidate.json --slurpfile checks evidence/smoke.json \
-            --arg platformDigest "$PLATFORM_DIGEST" --arg ciRun "$CI_RUN" \
-            --arg run "$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID" \
-            '$candidate[0] + {platform:"linux/amd64",platformDigest:$platformDigest,ciRun:$ciRun,qualificationRun:$run,checks:$checks[0]}' > evidence/release.json
-          (cd evidence && sha256sum candidate.json release.json sbom.spdx.json provenance.json > SHA256SUMS)
-          gh release upload "$RELEASE_TAG" evidence/release.json evidence/sbom.spdx.json evidence/provenance.json --clobber
-          # Upload the completion marker only after every evidence file is attached.
-          gh release upload "$RELEASE_TAG" evidence/SHA256SUMS
-      - name: Promote the same digest without replacing a version tag
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          CANDIDATE_DIGEST: ${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-          RELEASE_VERSION: ${{ steps.source.outputs.version }}
-        run: |
-          set -euo pipefail
-          : "${RELEASE_VERSION:?required version}"
-          : "${CANDIDATE_DIGEST:?required digest}"
-          [[ "$RELEASE_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
-          [[ "$CANDIDATE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          image=ghcr.io/ryro-hq/ryro-bot
-          # Distinguish a missing tag from authentication/network errors. Never overwrite a tag.
-          registry_token=$(curl --fail --silent --show-error --get https://ghcr.io/token \
-            --data-urlencode service=ghcr.io --data-urlencode scope=repository:ryro-hq/ryro-bot:pull \
-            --user "${GITHUB_ACTOR:?}:${GITHUB_TOKEN:?}" | jq -er .token)
-          headers=$(mktemp)
-          status=$(curl --silent --show-error --output /dev/null --dump-header "$headers" --write-out '%{http_code}' \
-            -H "Authorization: Bearer $registry_token" \
-            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json' \
-            "https://ghcr.io/v2/ryro-hq/ryro-bot/manifests/$RELEASE_VERSION")
-          if [[ "$status" == 200 ]]; then
-            existing=$(awk 'tolower($1)=="docker-content-digest:" {gsub("\r", "", $2); print $2}' "$headers")
-            [[ "$existing" == "$CANDIDATE_DIGEST" ]] || { echo 'Version tag already points to another digest' >&2; exit 1; }
-          elif [[ "$status" == 404 ]]; then
-            docker buildx imagetools create --prefer-index=false --tag "$image:$RELEASE_VERSION" "$image@$CANDIDATE_DIGEST"
-          else
-            echo "Registry lookup failed: HTTP $status" >&2
-            exit 1
-          fi
-          rm -f "$headers"
-      - name: Require anonymous access to the same version and digest
-        id: public
-        env:
-          RELEASE_VERSION: ${{ steps.source.outputs.version }}
-          CANDIDATE_DIGEST: ${{ steps.source.outputs.digest || steps.build.outputs.digest }}
-        run: |
-          token=$(curl --fail --silent --show-error --get https://ghcr.io/token \
-            --data-urlencode service=ghcr.io --data-urlencode scope=repository:ryro-hq/ryro-bot:pull | jq -er .token)
-          headers=$(mktemp)
-          curl --fail --silent --show-error --head -H "Authorization: Bearer $token" \
-            -H 'Accept: application/vnd.oci.image.index.v1+json' \
-            "https://ghcr.io/v2/ryro-hq/ryro-bot/manifests/$RELEASE_VERSION" > "$headers"
-          public_digest=$(awk 'tolower($1)=="docker-content-digest:" {gsub("\r", "", $2); print $2}' "$headers")
-          test "$public_digest" = "$CANDIDATE_DIGEST"
-          anonymous_config=$(mktemp -d)
-          docker --config "$anonymous_config" pull --platform linux/amd64 "ghcr.io/ryro-hq/ryro-bot@$CANDIDATE_DIGEST"
-          echo "digest=$public_digest" >> "$GITHUB_OUTPUT"
-      - name: Publish the verified draft
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          PUBLIC_DIGEST: ${{ steps.public.outputs.digest }}
-          RELEASE_SHA: ${{ steps.source.outputs.sha }}
-          RELEASE_VERSION: ${{ steps.source.outputs.version }}
-        run: |
-          test "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" = true
-          test "$(gh api "repos/$GH_REPO/git/ref/tags/$RELEASE_TAG" --jq .object.sha)" = "$RELEASE_SHA"
-          test "$(jq -r .digest evidence/candidate.json)" = "$PUBLIC_DIGEST"
-          (cd evidence && sha256sum --check --strict SHA256SUMS)
-          jq -r .body evidence/draft.json > evidence/notes.md
-          printf '\nImage: `ghcr.io/ryro-hq/ryro-bot:%s`\nDigest: `%s`\nCommit: %s\n' \
-            "$RELEASE_VERSION" "$PUBLIC_DIGEST" "$RELEASE_SHA" >> evidence/notes.md
-          gh release edit "$RELEASE_TAG" --draft=false --verify-tag --notes-file evidence/notes.md
-      - name: Collect image and PostgreSQL logs
-        if: always()
-        env:
-          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-        run: |
-          mkdir -p evidence
-          docker logs ryro-release-smoke > evidence/service.log 2>&1 || true
-          docker logs "$POSTGRES_CONTAINER" > evidence/postgres.log 2>&1 || true
-          docker rm -f ryro-release-smoke >/dev/null 2>&1 || true
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: always()
-        with:
-          name: release-evidence-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evidence/
-          if-no-files-found: ignore
-          retention-days: 14

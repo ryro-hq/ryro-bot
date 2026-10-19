@@ -53,75 +53,38 @@ upstream project's process. Keep embargoed reports private.
 
 ## Releases
 
-The `Release` workflow runs after successful **push** CI on `main`, independently
-of CI and merge groups. Automation stays disabled until the repository variable
-`RELEASES_ENABLED` is `true`. The first proposal is `0.1.0`; subsequent versions
-follow Conventional Commits (`fix` → patch, `feat` → minor, breaking changes →
-major). Release Please updates the package, lockfile and version manifest, with
-notes in the PR and GitHub Release; `skip-changelog` avoids a generated Markdown
-file. Do not use a permanent `release-as` override for the first version.
+The `Release Please` workflow runs on pushes to `main` and maintains a version
+PR from Conventional Commits. The first proposal is `0.1.0`; subsequent versions
+follow `fix` → patch, `feat` → minor and breaking changes → major. It updates the
+package, lockfile and version manifest; notes stay in the PR and GitHub Release
+with `skip-changelog: true`.
 
-Create a dedicated GitHub App and install it **only on `ryro-hq/ryro-bot`**. Grant
-repository **Contents: read/write** and **Pull requests: read/write**; metadata
-read access is implicit. It needs no package permissions, merge permission,
-ruleset bypass or webhook subscription. Store its client ID as the Actions
-variable `RELEASE_APP_CLIENT_ID` and its PEM private key as the Actions secret
-`RELEASE_APP_PRIVATE_KEY`. Then enable `RELEASES_ENABLED`. The official App token
-Action creates scoped, temporary tokens and revokes them at job completion.
+Create a dedicated GitHub App installed **only on `ryro-hq/ryro-bot`**, with
+**Contents: read/write** and **Pull requests: read/write**. Store its client ID as
+Actions variable `RELEASE_APP_CLIENT_ID` and its PEM private key as secret
+`RELEASE_APP_PRIVATE_KEY`. Set variable `RELEASES_ENABLED=true` to enable both
+workflows. The official token Action creates temporary tokens; the App needs
+no package permissions or ruleset bypass.
 
-Release Please's official Action is pinned by SHA. After each proposal update,
-the workflow formats the generated JSON and amends its single commit,
-using the App's actual bot login and numeric user ID for both author and DCO
-trailer. The subject is `chore(release): X.Y.Z`, compatible with commitlint.
-Pushing the amended commit triggers fresh PR checks. Review the generated version, notes,
-lockfile, DCO and quality results, then add the PR to the existing merge queue.
-Rebase preserves the commit and sign-off. The App never approves or merges it.
+The proposal is formatted and committed with the App's identity and DCO
+sign-off as `chore(release): X.Y.Z`. Review it and use the existing merge queue;
+CI and DCO checks remain required. The App never approves or merges the PR.
+After integration, Release Please creates the `vX.Y.Z` tag and GitHub Release.
+Its App token allows the tag push to trigger the separate container workflow.
 
-After that merge, Release Please creates a **draft** and immediately fixes its
-lightweight `vX.Y.Z` tag. Tags and draft contents are release state: do not move
-or delete them. Each publication rechecks that the tag points to the full target
-SHA, that this commit belongs to `main`, that all three version files agree and
-that `CI` completed successfully for a `push` of that exact SHA on `main`.
+`Publish container` checks out that tag, logs into GHCR with `GITHUB_TOKEN` and
+uses the official Docker metadata and build/push Actions to publish
+`ghcr.io/ryro-hq/ryro-bot:X.Y.Z` for Linux `amd64`. Buildx attaches SBOM and
+provenance to the image. SemVer is in OCI metadata; `RYRO_BOT_VERSION` contains
+the full source SHA. Application and image checks run in the existing CI.
 
-GitHub CLI handles draft inspection, asset downloads/uploads and publication
-directly in the workflow; there is no custom release program.
+The GitHub Release exists before image publication finishes. If publishing
+fails, use **Re-run failed jobs** on that tag's `Publish container` run; this
+builds and pushes the image again. Keep published Git tags fixed.
 
-The workflow builds Linux `amd64` with an SPDX SBOM and SLSA provenance, pushing
-a candidate to `ghcr.io/ryro-hq/ryro-bot`. Only `GITHUB_TOKEN` writes images.
-`candidate.json`, attached to the draft before testing, fixes the image digest,
-source SHA, version and build run. The downloaded digest must pass the compiled
-CLI checks, PostgreSQL migrations (including repeat application and schema check)
-and `/healthz` in `observe` mode. The same image index, including its attestations,
-is promoted to `ghcr.io/ryro-hq/ryro-bot:X.Y.Z` without a rebuild. The runtime's
-`RYRO_BOT_VERSION` remains the full source SHA; SemVer lives in the image's OCI
-labels and release metadata.
+After the first push, change the GHCR package visibility to **Public** in its
+settings and verify that an anonymous `docker pull` succeeds. Deployment and
+production migrations remain manual.
 
-**First registry push:** GHCR packages start private. When the candidate appears,
-open the package's settings in GitHub and change its visibility to **Public**.
-The publication gate checks the version tag anonymously and pulls the digest
-with an empty Docker credential configuration. Until this succeeds, the release
-remains a draft. No version/image badge advertises a release before this check.
-
-To recover a failed run, select **Release → Run workflow**, branch `main`, and
-supply the existing draft tag, for example `v0.1.0`. The workflow reuses the
-digest from `candidate.json` and reuses completed qualification when all evidence
-and `sha256sum --check` verifies the attached evidence. Incomplete qualification
-resumes with the same digest and may replace partial evidence in the draft.
-It accepts a preexisting version tag only if its
-digest matches. Missing evidence, failed migrations, private packages and
-conflicting tags stop publication. Published versions cannot be resumed or
-overwritten; corrections require another release PR. If a failure precedes
-`candidate.json`, no digest was committed and the candidate may be rebuilt.
-
-Before publishing the draft, the App attaches `sbom.spdx.json`, `provenance.json`,
-`release.json` (source SHA, digests, build/CI/qualification runs) and
-`SHA256SUMS` (standard SHA-256 checksums for these files and `candidate.json`).
-Failed smoke logs are retained in the workflow's evidence artifact. Releases
-and GHCR are the distribution channels; deployment and applying production
-migrations are manual.
-
-Run `npm run verify` before changing release automation and validate workflow
-changes with `actionlint`. Keep every external Action pinned by SHA. Image
-checks run in named Actions steps using a temporary PostgreSQL service.
-Activation, the human merge of the first release PR and the public
-GHCR check require the configured GitHub services; local checks do not publish.
+Keep external Actions pinned by SHA. Validate workflow edits with `actionlint`
+and follow the existing `npm run verify` checks.
