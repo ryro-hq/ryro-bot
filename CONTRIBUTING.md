@@ -28,12 +28,14 @@ and cache expiry.
 Do not add another person's sign-off. Contributions use the repository license.
 Retain upstream notices and identify copied code, sources, patches and licenses.
 
-Review must come from a human other than the author. Resolve conversations and
-obtain fresh approval after new commits. The App never approves or merges.
-With only `@fullzer4` registered, their changes wait for another human; an empty
-deputy or independent reviewer list is an acknowledged governance gap.
+While `@fullzer4` is the only maintainer, `ryro-bot` temporarily requires zero
+approvals; CODEOWNER and last-push approval requirements are disabled. Resolve
+conversations and use the merge queue with all required checks. Restore one
+independent human approval, CODEOWNER review and last-push approval when another
+maintainer can review. The App never approves or merges. The missing independent
+reviewer and deputy remain acknowledged governance gaps.
 
-After approval, add the PR to the merge queue. Quality, tests and the production
+Once required checks pass, add the PR to the merge queue. Quality, tests and the production
 build run against the combined SHA before the queue rebases one PR at a time.
 DCO sign-offs and individual commit messages are preserved; squash and merge commits are disabled.
 DCO and commit subjects are checked on each PR before queue admission.
