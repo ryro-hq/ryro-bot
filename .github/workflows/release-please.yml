@@ -1,0 +1,70 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: release-please-main
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    if: vars.RELEASES_ENABLED == 'true' && github.repository == 'ryro-hq/ryro-bot' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { ref: main, persist-credentials: false }
+      - uses: ./.github/actions/node
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        id: app
+        with:
+          app-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          repositories: ryro-bot
+          permission-contents: write
+          permission-pull-requests: write
+      - uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4.4.1
+        id: release
+        with:
+          token: ${{ steps.app.outputs.token }}
+          target-branch: main
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.release.outputs.prs_created == 'true'
+        with:
+          ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+          token: ${{ steps.app.outputs.token }}
+          path: release-proposal
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Format and sign the proposal with the App identity
+        if: steps.release.outputs.prs_created == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          RELEASE_BRANCH: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+        run: |
+          login="${APP_SLUG}[bot]"
+          id=$(gh api "users/$login" --jq .id)
+          git -C release-proposal config user.name "$login"
+          git -C release-proposal config user.email "${id}+${login}@users.noreply.github.com"
+          original=$(git -C release-proposal rev-parse HEAD)
+          test "$(git -C release-proposal rev-list --count HEAD ^origin/main)" = 1
+          git -C release-proposal diff --quiet origin/main...HEAD -- . ':!package.json' ':!package-lock.json' ':!.release-please-manifest.json'
+          subject=$(git -C release-proposal log -1 --format=%s)
+          [[ "$subject" =~ ^chore\(release\):\ [0-9]+\.[0-9]+\.[0-9]+$ ]]
+          node_modules/.bin/oxfmt --config .oxfmtrc.json release-proposal/package.json release-proposal/package-lock.json release-proposal/.release-please-manifest.json
+          git -C release-proposal add package.json package-lock.json .release-please-manifest.json
+          git -C release-proposal -c core.hooksPath=/dev/null commit --amend --reset-author --signoff --message "$subject"
+          git -C release-proposal -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin "HEAD:$RELEASE_BRANCH" "--force-with-lease=refs/heads/$RELEASE_BRANCH:$original"

@@ -5,8 +5,8 @@
   "include-component-in-tag": false,
   "include-v-in-tag": true,
   "skip-changelog": true,
-  "draft": true,
-  "force-tag-creation": true,
   "pull-request-title-pattern": "chore(release): ${version}",
-  "packages": { ".": {} }
+  "packages": {
+    ".": {}
+  }
 }

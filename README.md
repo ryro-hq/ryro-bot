@@ -45,9 +45,8 @@ Use a database hostname reachable from the container. Migrations require only
 database configuration; run them before starting the service. Compiled admin
 commands are available with `node dist/admin.js --help`.
 
-Releases go through a reviewed Release Please PR, the merge queue and image
-qualification. See [release setup and recovery](CONTRIBUTING.md#releases).
-Deployment to the server is manual. Version and registry badges will be added
-after the first verified publication.
+Release Please manages the version PR, tag and release. After merge queue
+checks, the version tag triggers publication to GHCR. See
+[release setup and recovery](CONTRIBUTING.md#releases). Server deployment is manual.
 
 [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [License](LICENSE)
